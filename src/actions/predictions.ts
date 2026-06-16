@@ -37,11 +37,14 @@ export async function savePrediction(
     return { error: 'Prazo encerrado' }
   }
 
-  await prisma.prediction.upsert({
-    where: { userId_gameId: { userId: session.user.id, gameId } },
-    create: { userId: session.user.id, gameId, homeScore, awayScore },
-    update: { homeScore, awayScore },
-  })
-
-  return { success: true }
+  try {
+    await prisma.prediction.upsert({
+      where: { userId_gameId: { userId: session.user.id, gameId } },
+      create: { userId: session.user.id, gameId, homeScore, awayScore },
+      update: { homeScore, awayScore },
+    })
+    return { success: true }
+  } catch {
+    return { error: 'Erro ao salvar palpite' }
+  }
 }

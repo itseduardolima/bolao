@@ -18,8 +18,8 @@ export default function Button({
       disabled={disabled}
       className={cn(
         'inline-flex cursor-pointer items-center justify-center font-barlow font-bold uppercase tracking-wide transition-opacity',
-        'rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-        variant === 'primary' && 'bg-accent text-base hover:opacity-85',
+        'rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent text-[16px]',
+        variant === 'primary' && 'bg-accent text-black hover:opacity-85',
         variant === 'ghost' &&
           'border border-border text-secondary hover:text-primary',
         size === 'md' && 'px-6 py-2.5 text-base',

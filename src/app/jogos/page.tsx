@@ -47,9 +47,9 @@ export default async function JogosPage({
     },
   })
 
-  const dates = [
-    ...new Set(allGames.map((g) => toBRTDate(g.startsAt))),
-  ]
+  const dates: string[] = Array.from(
+    new Set(allGames.map((g) => toBRTDate(g.startsAt)))
+  )
 
   if (dates.length === 0) {
     return (

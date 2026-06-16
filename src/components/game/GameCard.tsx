@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { ArrowRight, PencilSimple } from '@phosphor-icons/react/dist/ssr'
 import { cn, formatGameTime } from '@/lib/utils'
 import { StatusBadge } from '@/components/ui/Badge'
+import LiveScore from '@/components/game/LiveScore'
 import type { GameStatus } from '@/types'
 
 type GameCardProps = {
@@ -67,9 +68,18 @@ export default function GameCard({
 
         <div className="flex min-w-[80px] flex-col items-center">
           {showScore ? (
-            <span className="font-barlow text-[40px] font-black leading-none text-accent">
-              {homeScore ?? 0} × {awayScore ?? 0}
-            </span>
+            status === 'LIVE' ? (
+              <LiveScore
+                gameId={id}
+                initialStatus={status}
+                initialHomeScore={homeScore}
+                initialAwayScore={awayScore}
+              />
+            ) : (
+              <span className="font-barlow text-[40px] font-black leading-none text-accent">
+                {homeScore ?? 0} × {awayScore ?? 0}
+              </span>
+            )
           ) : (
             <span className="font-barlow text-xl font-bold text-secondary">VS</span>
           )}

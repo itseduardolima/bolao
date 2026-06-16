@@ -17,7 +17,7 @@ export default function Button({
     <button
       disabled={disabled}
       className={cn(
-        'inline-flex items-center justify-center font-barlow font-bold uppercase tracking-wide transition-opacity',
+        'inline-flex cursor-pointer items-center justify-center font-barlow font-bold uppercase tracking-wide transition-opacity',
         'rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
         variant === 'primary' && 'bg-accent text-base hover:opacity-85',
         variant === 'ghost' &&

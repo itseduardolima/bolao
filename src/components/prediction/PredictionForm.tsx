@@ -1,0 +1,125 @@
+'use client'
+
+import { useState, useEffect, useTransition } from 'react'
+import { InputScore } from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
+import { formatCountdown } from '@/lib/utils'
+import { savePrediction } from '@/actions/predictions'
+import { Timer } from '@phosphor-icons/react'
+
+const COUNTDOWN_THRESHOLD_MS = 5 * 60 * 1000 // 5 minutes
+
+type PredictionFormProps = {
+  gameId: string
+  homeTeam: string
+  awayTeam: string
+  startsAt: string
+  initialHomeScore?: number | null
+  initialAwayScore?: number | null
+}
+
+export default function PredictionForm({
+  gameId,
+  homeTeam,
+  awayTeam,
+  startsAt,
+  initialHomeScore,
+  initialAwayScore,
+}: PredictionFormProps) {
+  const [homeScore, setHomeScore] = useState(
+    initialHomeScore != null ? String(initialHomeScore) : ''
+  )
+  const [awayScore, setAwayScore] = useState(
+    initialAwayScore != null ? String(initialAwayScore) : ''
+  )
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  const startsAtMs = new Date(startsAt).getTime()
+  const [msLeft, setMsLeft] = useState(() => startsAtMs - Date.now())
+
+  useEffect(() => {
+    if (msLeft <= 0) return
+    const id = setInterval(() => {
+      setMsLeft(startsAtMs - Date.now())
+    }, 1000)
+    return () => clearInterval(id)
+  }, [startsAtMs, msLeft])
+
+  const isLocked = msLeft <= 0
+
+  if (isLocked) {
+    return (
+      <p className="font-inter text-sm text-muted">Palpites encerrados para este jogo.</p>
+    )
+  }
+
+  const isCountdown = msLeft < COUNTDOWN_THRESHOLD_MS
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const home = parseInt(homeScore, 10)
+    const away = parseInt(awayScore, 10)
+    if (isNaN(home) || isNaN(away)) {
+      setFeedback({ type: 'error', message: 'Palpite inválido' })
+      return
+    }
+    setFeedback(null)
+    startTransition(async () => {
+      const result = await savePrediction(gameId, home, away)
+      if ('success' in result) {
+        setFeedback({ type: 'success', message: '✓ Palpite salvo!' })
+      } else {
+        setFeedback({ type: 'error', message: result.error })
+      }
+    })
+  }
+
+  return (
+    <div>
+      {isCountdown && (
+        <p className="mb-3 flex items-center gap-1.5 font-inter text-sm text-warning">
+          <Timer size={16} weight="bold" />
+          Palpites encerram em {formatCountdown(msLeft)}
+        </p>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div className="flex items-center gap-4">
+          <span className="font-barlow text-sm font-bold uppercase text-secondary">
+            {homeTeam}
+          </span>
+          <InputScore
+            value={homeScore}
+            onChange={(e) => setHomeScore(e.target.value)}
+            disabled={isPending}
+            aria-label={`Gols ${homeTeam}`}
+          />
+          <span className="font-barlow text-lg font-bold text-muted">×</span>
+          <InputScore
+            value={awayScore}
+            onChange={(e) => setAwayScore(e.target.value)}
+            disabled={isPending}
+            aria-label={`Gols ${awayTeam}`}
+          />
+          <span className="font-barlow text-sm font-bold uppercase text-secondary">
+            {awayTeam}
+          </span>
+          <Button type="submit" variant="primary" size="sm" disabled={isPending}>
+            {isPending ? 'Salvando...' : 'Salvar'}
+          </Button>
+        </div>
+      </form>
+
+      {feedback && (
+        <p
+          className={`mt-2 font-inter text-sm ${
+            feedback.type === 'success' ? 'text-accent' : 'text-error'
+          }`}
+        >
+          {feedback.message}
+        </p>
+      )}
+    </div>
+  )
+}

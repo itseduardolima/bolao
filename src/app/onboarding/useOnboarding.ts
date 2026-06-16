@@ -2,13 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 
 type CheckStatus = 'idle' | 'checking' | 'available' | 'unavailable' | 'invalid'
 
 export function useOnboarding() {
   const { update } = useSession()
-  const router = useRouter()
 
   const [value, setValue] = useState('')
   const [status, setStatus] = useState<CheckStatus>('idle')
@@ -68,7 +66,7 @@ export function useOnboarding() {
       }
 
       await update()
-      router.push('/jogos')
+      window.location.href = '/jogos'
     } catch {
       setError('Erro de conexão. Tente novamente.')
     } finally {

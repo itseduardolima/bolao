@@ -95,7 +95,7 @@ export default function GameCard({
                 {prediction.homeScore} × {prediction.awayScore}
               </span>
             </span>
-            {prediction.points !== null && (
+            {prediction.points !== null ? (
               <span
                 className={cn(
                   'rounded-full px-2 py-0.5 font-inter text-xs font-semibold',
@@ -106,8 +106,7 @@ export default function GameCard({
               >
                 {prediction.points === 3 ? '+3 pts' : prediction.points === 1 ? '+1 pt' : '0 pts'}
               </span>
-            )}
-            {prediction.points === null && (
+            ) : (
               <span className="font-inter text-xs text-muted">aguardando</span>
             )}
           </div>

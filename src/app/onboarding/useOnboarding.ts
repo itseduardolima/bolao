@@ -4,8 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
-const NICKNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/
-
 type CheckStatus = 'idle' | 'checking' | 'available' | 'unavailable' | 'invalid'
 
 export function useOnboarding() {
@@ -27,7 +25,7 @@ export function useOnboarding() {
       return
     }
 
-    if (!NICKNAME_REGEX.test(value)) {
+    if (value.trim().length < 3 || value.trim().length > 20) {
       setStatus('invalid')
       return
     }

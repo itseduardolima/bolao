@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
-const NICKNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/
-
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session?.user?.id) {
@@ -13,9 +11,9 @@ export async function POST(req: NextRequest) {
   const body = await req.json() as { nickname?: unknown }
   const nickname = typeof body.nickname === 'string' ? body.nickname.trim() : ''
 
-  if (!NICKNAME_REGEX.test(nickname)) {
+  if (nickname.length < 3 || nickname.length > 20) {
     return NextResponse.json(
-      { error: 'Nickname inválido. Use 3–20 caracteres: letras, números ou _' },
+      { error: 'O apelido deve ter entre 3 e 20 caracteres' },
       { status: 400 }
     )
   }

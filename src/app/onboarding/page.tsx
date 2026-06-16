@@ -12,7 +12,7 @@ const statusMessage: Record<string, { text: string; color: string }> = {
   available: { text: '✓ Disponível', color: 'text-accent' },
   unavailable: { text: '✗ Já está em uso', color: 'text-error' },
   invalid: {
-    text: 'Use 3–20 caracteres: letras, números ou _',
+    text: 'Entre 3 e 20 caracteres',
     color: 'text-muted',
   },
 }
@@ -36,7 +36,7 @@ export default function OnboardingPage() {
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder="ex: eduardo_27"
+              placeholder="ex: Eduardo Lindo"
               maxLength={20}
               autoFocus
               autoComplete="off"

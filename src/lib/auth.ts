@@ -8,15 +8,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: { strategy: 'jwt' },
   providers: [Google],
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id!
         token.hasNickname = user.hasNickname ?? false
         token.nickname = user.nickname ?? null
       }
-      if (trigger === 'update') {
+      if (token.id && !token.hasNickname) {
         const dbUser = await prisma.user.findUnique({
-          where: { id: token.id },
+          where: { id: token.id as string },
           select: { hasNickname: true, nickname: true },
         })
         if (dbUser) {

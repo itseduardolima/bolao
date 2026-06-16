@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { formatGameTime, formatGameDate } from '@/lib/utils'
@@ -35,7 +36,6 @@ export default async function GameDetailPage({
         homeScore: true,
         awayScore: true,
         phase: true,
-        groupName: true,
         venue: true,
         city: true,
       },
@@ -147,9 +147,9 @@ export default async function GameDetailPage({
 
           {!userId && (
             <p className="font-inter text-sm text-secondary">
-              <a href="/?login=1" className="text-accent underline">
+              <Link href="/?login=1" className="text-accent underline">
                 Entre
-              </a>{' '}
+              </Link>{' '}
               para enviar seu palpite.
             </p>
           )}
@@ -163,7 +163,7 @@ export default async function GameDetailPage({
                   <span className="font-semibold text-primary">
                     {prediction.homeScore} × {prediction.awayScore}
                   </span>
-                  {prediction.points !== null && (
+                  {status === 'FINISHED' && prediction.points !== null && (
                     <span className="ml-2 text-accent">+{prediction.points} pts</span>
                   )}
                 </p>

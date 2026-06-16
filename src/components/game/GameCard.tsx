@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { ArrowRight, PencilSimple } from '@phosphor-icons/react/dist/ssr'
 import { cn, formatGameTime } from '@/lib/utils'
 import { StatusBadge } from '@/components/ui/Badge'
 import type { GameStatus } from '@/types'
@@ -111,8 +112,18 @@ export default function GameCard({
             )}
           </div>
         ) : isAuthenticated ? (
-          <span className="font-inter text-xs text-accent">
-            {status === 'SCHEDULED' ? 'Palpitar →' : 'Ver detalhes →'}
+          <span className="flex items-center gap-1 font-inter text-xs text-accent">
+            {status === 'SCHEDULED' ? (
+              <>
+                <PencilSimple size={12} weight="bold" />
+                Palpitar
+              </>
+            ) : (
+              <>
+                Ver detalhes
+                <ArrowRight size={12} weight="bold" />
+              </>
+            )}
           </span>
         ) : (
           <span className="font-inter text-xs text-muted">Entre para palpitar</span>

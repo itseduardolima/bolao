@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { LockSimple, SignIn } from '@phosphor-icons/react/dist/ssr'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { formatGameTime, formatGameDate } from '@/lib/utils'
+import { cn, formatGameTime, formatGameDate } from '@/lib/utils'
 import Container from '@/components/layout/Container'
 import { StatusBadge } from '@/components/ui/Badge'
 import LiveScore from '@/components/game/LiveScore'
@@ -146,27 +147,48 @@ export default async function GameDetailPage({
           </h2>
 
           {!userId && (
-            <p className="font-inter text-sm text-secondary">
-              <Link href="/?login=1" className="text-accent underline">
-                Entre
-              </Link>{' '}
-              para enviar seu palpite.
-            </p>
+            <Link
+              href="/?login=1"
+              className="flex items-center gap-2 font-inter text-sm text-secondary transition-colors hover:text-primary"
+            >
+              <SignIn size={16} weight="bold" className="text-accent" />
+              Entre para enviar seu palpite
+            </Link>
           )}
 
           {userId && (status === 'LIVE' || status === 'FINISHED') && (
-            <div>
-              <p className="font-inter text-sm text-muted">Palpites encerrados para este jogo.</p>
-              {prediction && (
-                <p className="mt-2 font-inter text-sm text-secondary">
-                  Seu palpite:{' '}
-                  <span className="font-semibold text-primary">
+            <div className="space-y-3">
+              <p className="flex items-center gap-1.5 font-inter text-sm text-muted">
+                <LockSimple size={14} weight="bold" />
+                Palpites encerrados
+              </p>
+              {prediction ? (
+                <div className="flex items-center justify-between rounded-lg bg-elevated px-4 py-3">
+                  <span className="font-inter text-xs text-muted">Seu palpite</span>
+                  <span className="font-barlow text-lg font-bold text-primary">
                     {prediction.homeScore} × {prediction.awayScore}
                   </span>
                   {status === 'FINISHED' && prediction.points !== null && (
-                    <span className="ml-2 text-accent">+{prediction.points} pts</span>
+                    <span
+                      className={cn(
+                        'rounded-full px-2.5 py-0.5 font-inter text-xs font-semibold',
+                        prediction.points === 3 &&
+                          'border border-accent-border bg-accent-dim text-accent',
+                        prediction.points === 1 &&
+                          'border border-warning-border bg-warning-dim text-warning',
+                        prediction.points === 0 && 'bg-elevated text-muted'
+                      )}
+                    >
+                      {prediction.points === 3
+                        ? '+3 pts'
+                        : prediction.points === 1
+                          ? '+1 pt'
+                          : '0 pts'}
+                    </span>
                   )}
-                </p>
+                </div>
+              ) : (
+                <p className="font-inter text-xs text-muted">Você não enviou palpite.</p>
               )}
             </div>
           )}
@@ -183,7 +205,10 @@ export default async function GameDetailPage({
           )}
 
           {userId && status === 'SCHEDULED' && !canPredict && (
-            <p className="font-inter text-sm text-muted">Palpites encerrados para este jogo.</p>
+            <p className="flex items-center gap-1.5 font-inter text-sm text-muted">
+              <LockSimple size={14} weight="bold" />
+              Palpites encerrados
+            </p>
           )}
         </div>
 

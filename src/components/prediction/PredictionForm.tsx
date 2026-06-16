@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
+import { Timer, CheckCircle, XCircle } from '@phosphor-icons/react'
 import { InputScore } from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { formatCountdown } from '@/lib/utils'
 import { savePrediction } from '@/actions/predictions'
-import { Timer } from '@phosphor-icons/react'
 
-const COUNTDOWN_THRESHOLD_MS = 5 * 60 * 1000 // 5 minutes
+const COUNTDOWN_THRESHOLD_MS = 5 * 60 * 1000
 
 type PredictionFormProps = {
   gameId: string
@@ -32,7 +32,9 @@ export default function PredictionForm({
   const [awayScore, setAwayScore] = useState(
     initialAwayScore != null ? String(initialAwayScore) : ''
   )
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(
+    null
+  )
   const [isPending, startTransition] = useTransition()
 
   const startsAtMs = new Date(startsAt).getTime()
@@ -70,7 +72,7 @@ export default function PredictionForm({
     startTransition(async () => {
       const result = await savePrediction(gameId, home, away)
       if ('success' in result) {
-        setFeedback({ type: 'success', message: '✓ Palpite salvo!' })
+        setFeedback({ type: 'success', message: 'Palpite salvo!' })
       } else {
         setFeedback({ type: 'error', message: result.error })
       }
@@ -80,45 +82,57 @@ export default function PredictionForm({
   return (
     <div>
       {isCountdown && (
-        <p className="mb-3 flex items-center gap-1.5 font-inter text-sm text-warning">
-          <Timer size={16} weight="bold" />
+        <p className="mb-4 flex items-center gap-1.5 font-inter text-sm text-warning">
+          <Timer size={15} weight="bold" />
           Palpites encerram em {formatCountdown(Math.max(0, msLeft))}
         </p>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <div className="flex items-center gap-4">
-          <span className="font-barlow text-sm font-bold uppercase text-secondary">
-            {homeTeam}
-          </span>
-          <InputScore
-            value={homeScore}
-            onChange={(e) => setHomeScore(e.target.value)}
-            disabled={isPending}
-            aria-label={`Gols ${homeTeam}`}
-          />
-          <span className="font-barlow text-lg font-bold text-muted">×</span>
-          <InputScore
-            value={awayScore}
-            onChange={(e) => setAwayScore(e.target.value)}
-            disabled={isPending}
-            aria-label={`Gols ${awayTeam}`}
-          />
-          <span className="font-barlow text-sm font-bold uppercase text-secondary">
-            {awayTeam}
-          </span>
-          <Button type="submit" variant="primary" size="sm" disabled={isPending}>
-            {isPending ? 'Salvando...' : 'Salvar'}
-          </Button>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="flex items-end justify-center gap-6">
+          <div className="flex flex-col items-center gap-2">
+            <span className="font-barlow text-sm font-bold uppercase tracking-wide text-secondary">
+              {homeTeam}
+            </span>
+            <InputScore
+              value={homeScore}
+              onChange={(e) => setHomeScore(e.target.value)}
+              disabled={isPending}
+              aria-label={`Gols ${homeTeam}`}
+            />
+          </div>
+
+          <span className="mb-4 font-barlow text-2xl font-bold text-muted">×</span>
+
+          <div className="flex flex-col items-center gap-2">
+            <span className="font-barlow text-sm font-bold uppercase tracking-wide text-secondary">
+              {awayTeam}
+            </span>
+            <InputScore
+              value={awayScore}
+              onChange={(e) => setAwayScore(e.target.value)}
+              disabled={isPending}
+              aria-label={`Gols ${awayTeam}`}
+            />
+          </div>
         </div>
+
+        <Button type="submit" variant="primary" disabled={isPending} className="w-full">
+          {isPending ? 'Salvando...' : 'Salvar palpite'}
+        </Button>
       </form>
 
       {feedback && (
         <p
-          className={`mt-2 font-inter text-sm ${
+          className={`mt-3 flex items-center gap-1.5 font-inter text-sm ${
             feedback.type === 'success' ? 'text-accent' : 'text-error'
           }`}
         >
+          {feedback.type === 'success' ? (
+            <CheckCircle size={15} weight="fill" />
+          ) : (
+            <XCircle size={15} weight="fill" />
+          )}
           {feedback.message}
         </p>
       )}

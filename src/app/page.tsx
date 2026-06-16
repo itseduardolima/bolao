@@ -64,10 +64,10 @@ export default async function HomePage() {
               <tr>
                 <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-left w-8">#</th>
                 <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-left">Participante</th>
-                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-right">Pontos</th>
-                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-right hidden sm:table-cell">Exatos</th>
-                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-right hidden sm:table-cell">Vencedor</th>
-                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-right hidden sm:table-cell">Jogos</th>
+                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-center">Pontos</th>
+                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-center hidden sm:table-cell">Exatos</th>
+                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-center hidden sm:table-cell">Vencedor</th>
+                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-center hidden sm:table-cell">Jogos</th>
               </tr>
             </thead>
             <tbody>
@@ -103,7 +103,7 @@ export default async function HomePage() {
                         )}
                       </div>
                     </td>
-                    <td className="py-3 text-right align-middle">
+                    <td className="py-3 text-center align-middle">
                       {entry.totalPoints > 0 ? (
                         <span className="font-barlow text-xl font-bold text-accent">
                           {entry.totalPoints}
@@ -112,13 +112,13 @@ export default async function HomePage() {
                         <span className="font-barlow text-xl text-muted">0</span>
                       )}
                     </td>
-                    <td className="py-3 text-right align-middle hidden sm:table-cell">
+                    <td className="py-3 text-center align-middle hidden sm:table-cell">
                       <span className="font-inter text-sm text-secondary">{entry.exactHits}</span>
                     </td>
-                    <td className="py-3 text-right align-middle hidden sm:table-cell">
+                    <td className="py-3 text-center align-middle hidden sm:table-cell">
                       <span className="font-inter text-sm text-secondary">{entry.winnerHits}</span>
                     </td>
-                    <td className="py-3 text-right align-middle hidden sm:table-cell">
+                    <td className="py-3 text-center align-middle hidden sm:table-cell">
                       <span className="font-inter text-sm text-secondary">{entry.gamesPlayed}</span>
                     </td>
                   </tr>

@@ -1,8 +1,15 @@
 import Link from 'next/link'
 import { Trophy } from '@phosphor-icons/react/dist/ssr'
+import { auth } from '@/lib/auth'
+import Avatar from '@/components/ui/Avatar'
 import Container from './Container'
+import SignInButton from './SignInButton'
+import SignOutButton from './SignOutButton'
 
-export default function Header() {
+export default async function Header() {
+  const session = await auth()
+  const user = session?.user
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-base-dark">
       <Container className="flex h-14 items-center justify-between py-0">
@@ -21,12 +28,21 @@ export default function Header() {
           >
             Jogos
           </Link>
-          <Link
-            href="/perfil"
-            className="font-inter text-sm font-medium text-secondary transition-colors hover:text-primary"
-          >
-            Meu perfil
-          </Link>
+
+          {user ? (
+            <>
+              <Link
+                href="/perfil"
+                className="flex items-center gap-2 font-inter text-sm font-medium text-secondary transition-colors hover:text-primary"
+              >
+                <Avatar src={user.image ?? null} name={user.nickname ?? user.name ?? 'U'} size={28} />
+                {user.nickname ?? user.name}
+              </Link>
+              <SignOutButton />
+            </>
+          ) : (
+            <SignInButton />
+          )}
         </nav>
       </Container>
     </header>

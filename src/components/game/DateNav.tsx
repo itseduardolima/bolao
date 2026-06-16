@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 type DateNavProps = {
   dates: string[]
   selectedDate: string
+  today: string
 }
 
 function formatDateLabel(dateStr: string) {
@@ -28,10 +29,9 @@ function formatDateLabel(dateStr: string) {
   return { weekday, day, month }
 }
 
-export default function DateNav({ dates, selectedDate }: DateNavProps) {
+export default function DateNav({ dates, selectedDate, today }: DateNavProps) {
   const router = useRouter()
   const selectedRef = useRef<HTMLButtonElement>(null)
-  const today = new Date().toISOString().slice(0, 10)
 
   useEffect(() => {
     selectedRef.current?.scrollIntoView({

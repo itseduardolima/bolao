@@ -1,0 +1,40 @@
+import { auth } from '@/lib/auth'
+import { NextResponse } from 'next/server'
+
+export default auth((req) => {
+  const session = req.auth
+  const path = req.nextUrl.pathname
+
+  const isAuthenticated = !!session?.user
+  const hasNickname = session?.user?.hasNickname ?? false
+
+  const isPublicPath =
+    path === '/' ||
+    path === '/jogos' ||
+    path.startsWith('/api/auth') ||
+    path.startsWith('/api/cron') ||
+    path.startsWith('/api/games')
+
+  const isApiPath = path.startsWith('/api/')
+
+  // Regra 1: não autenticado tentando acessar rota protegida
+  if (!isAuthenticated && !isPublicPath && path !== '/onboarding') {
+    return NextResponse.redirect(new URL('/?login=1', req.url))
+  }
+
+  // Regra 2: autenticado sem nickname → forçar onboarding
+  if (isAuthenticated && !hasNickname && path !== '/onboarding' && !isApiPath) {
+    return NextResponse.redirect(new URL('/onboarding', req.url))
+  }
+
+  // Regra 3: autenticado com nickname tentando acessar /onboarding
+  if (isAuthenticated && hasNickname && path === '/onboarding') {
+    return NextResponse.redirect(new URL('/jogos', req.url))
+  }
+
+  return NextResponse.next()
+})
+
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+}

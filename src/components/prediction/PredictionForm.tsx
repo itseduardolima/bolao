@@ -39,12 +39,14 @@ export default function PredictionForm({
   const [msLeft, setMsLeft] = useState(() => startsAtMs - Date.now())
 
   useEffect(() => {
-    if (msLeft <= 0) return
+    if (startsAtMs - Date.now() <= 0) return
     const id = setInterval(() => {
-      setMsLeft(startsAtMs - Date.now())
+      const remaining = startsAtMs - Date.now()
+      setMsLeft(remaining)
+      if (remaining <= 0) clearInterval(id)
     }, 1000)
     return () => clearInterval(id)
-  }, [startsAtMs, msLeft])
+  }, [startsAtMs])
 
   const isLocked = msLeft <= 0
 
@@ -60,7 +62,7 @@ export default function PredictionForm({
     e.preventDefault()
     const home = parseInt(homeScore, 10)
     const away = parseInt(awayScore, 10)
-    if (isNaN(home) || isNaN(away)) {
+    if (isNaN(home) || isNaN(away) || home < 0 || away < 0) {
       setFeedback({ type: 'error', message: 'Palpite inválido' })
       return
     }
@@ -80,7 +82,7 @@ export default function PredictionForm({
       {isCountdown && (
         <p className="mb-3 flex items-center gap-1.5 font-inter text-sm text-warning">
           <Timer size={16} weight="bold" />
-          Palpites encerram em {formatCountdown(msLeft)}
+          Palpites encerram em {formatCountdown(Math.max(0, msLeft))}
         </p>
       )}
 

@@ -1,10 +1,7 @@
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Container from '@/components/layout/Container'
 import SectionTitle from '@/components/layout/SectionTitle'
 import Avatar from '@/components/ui/Avatar'
-import { cn } from '@/lib/utils'
-
 export const dynamic = 'force-dynamic'
 
 type RankingRow = {
@@ -18,9 +15,6 @@ type RankingRow = {
 }
 
 export default async function HomePage() {
-  const session = await auth()
-  const currentUserId = session?.user?.id ?? null
-
   const rows = await prisma.$queryRaw<RankingRow[]>`
     SELECT
       u.id,
@@ -79,15 +73,11 @@ export default async function HomePage() {
             <tbody>
               {ranking.map((entry, index) => {
                 const rank = index + 1
-                const isCurrentUser = entry.id === currentUserId
 
                 return (
                   <tr
                     key={entry.id}
-                    className={cn(
-                      'border-b border-border transition-colors hover:bg-elevated/50',
-                      isCurrentUser && 'bg-accent/5 border-l-2 border-accent'
-                    )}
+                    className="border-b border-border transition-colors hover:bg-elevated/50"
                   >
                     <td className="py-3 pr-3 align-middle">
                       <span

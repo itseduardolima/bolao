@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local database and migration artifacts
+*.db
+*.db-shm
+*.db-wal
+init.sql

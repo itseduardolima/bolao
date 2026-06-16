@@ -4,7 +4,6 @@ import { prisma } from '@/lib/prisma'
 import Container from '@/components/layout/Container'
 import SectionTitle from '@/components/layout/SectionTitle'
 import { formatGameDate, formatGameTime } from '@/lib/utils'
-import { cn } from '@/lib/utils'
 import type { GameStatus } from '@/types'
 
 export const revalidate = 30

@@ -1,5 +1,8 @@
-import { auth } from '@/lib/auth'
+import NextAuth from 'next-auth'
 import { NextResponse } from 'next/server'
+import { authConfig } from '@/lib/auth.config'
+
+const { auth } = NextAuth(authConfig)
 
 export default auth((req) => {
   const session = req.auth
@@ -11,6 +14,7 @@ export default auth((req) => {
   const isPublicPath =
     path === '/' ||
     path === '/jogos' ||
+    path === '/pontuacao' ||
     path.startsWith('/api/auth') ||
     path.startsWith('/api/cron') ||
     path.startsWith('/api/games')

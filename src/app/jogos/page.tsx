@@ -68,7 +68,10 @@ export default async function JogosPage() {
   const sortedPhases = [...byPhase.keys()].sort((a, b) => {
     const ai = PHASE_ORDER.indexOf(a)
     const bi = PHASE_ORDER.indexOf(b)
-    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
+    const av = ai === -1 ? Infinity : ai
+    const bv = bi === -1 ? Infinity : bi
+    if (av !== bv) return av - bv
+    return a.localeCompare(b)
   })
 
   return (

@@ -11,9 +11,10 @@ export default function SignOutButton() {
       size="sm"
       onClick={() => signOut({ callbackUrl: '/' })}
       className="flex items-center gap-1.5"
+      aria-label="Sair"
     >
       <SignOut size={16} weight="bold" />
-      Sair
+      <span className="hidden sm:inline">Sair</span>
     </Button>
   )
 }

@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const result = await syncGames()
+  const force = req.nextUrl.searchParams.get('force') === 'true'
+  const result = await syncGames(force)
   return NextResponse.json(result)
 }

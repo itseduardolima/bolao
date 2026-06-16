@@ -52,9 +52,11 @@ async function recalculatePoints(
   }
 }
 
-export async function syncGames(): Promise<SyncResult> {
-  const nearby = await hasGameNearby()
-  if (!nearby) return { skipped: true }
+export async function syncGames(force = false): Promise<SyncResult> {
+  if (!force) {
+    const nearby = await hasGameNearby()
+    if (!nearby) return { skipped: true }
+  }
 
   let matches: Awaited<ReturnType<typeof fetchMatches>>
   try {

@@ -18,7 +18,7 @@ export default async function Header() {
           className="flex items-center gap-2 font-barlow text-[22px] font-black uppercase tracking-wide text-accent"
         >
           <Trophy size={22} weight="fill" />
-          Bolão 2026
+          Bolão - Copa do mundo 2026
         </Link>
 
         <nav className="flex items-center gap-6">
@@ -27,6 +27,13 @@ export default async function Header() {
             className="font-inter text-sm font-medium text-secondary transition-colors hover:text-primary"
           >
             Jogos
+          </Link>
+
+          <Link
+            href="/pontuacao"
+            className="font-inter text-sm font-medium text-secondary transition-colors hover:text-primary"
+          >
+            Pontuação
           </Link>
 
           {user ? (

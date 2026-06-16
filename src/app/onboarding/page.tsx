@@ -8,12 +8,12 @@ import SectionTitle from '@/components/layout/SectionTitle'
 
 const statusMessage: Record<string, { text: string; color: string }> = {
   idle: { text: '', color: '' },
-  checking: { text: 'Verificando...', color: 'text-muted' },
+  checking: { text: 'Verificando...', color: 'text-secondary' },
   available: { text: '✓ Disponível', color: 'text-accent' },
   unavailable: { text: '✗ Já está em uso', color: 'text-error' },
   invalid: {
     text: 'Entre 3 e 20 caracteres',
-    color: 'text-muted',
+    color: 'text-secondary',
   },
 }
 

@@ -31,7 +31,7 @@ export default async function ParticipantPredictions({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h3 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-muted">
+        <h3 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-secondary">
           Palpites dos participantes
         </h3>
         <div className="flex flex-col gap-2">
@@ -63,7 +63,7 @@ export default async function ParticipantPredictions({
                         ? 'border border-accent-border bg-accent-dim text-accent'
                         : p.points === 1
                         ? 'border border-warning-border bg-warning-dim text-warning'
-                        : 'bg-elevated text-muted'
+                        : 'bg-elevated text-secondary'
                     }`}
                   >
                     {p.points === 3 ? '+3' : p.points === 1 ? '+1' : '0'}
@@ -76,7 +76,7 @@ export default async function ParticipantPredictions({
       </div>
 
       <div>
-        <h3 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-muted">
+        <h3 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-secondary">
           Estatísticas
         </h3>
         <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-5">
@@ -94,7 +94,7 @@ export default async function ParticipantPredictions({
           </div>
           <div className="flex justify-between font-inter text-sm">
             <span className="text-secondary">Erraram</span>
-            <span className="font-semibold text-muted">
+            <span className="font-semibold text-secondary">
               {miss} pessoa{miss !== 1 ? 's' : ''} ({pct(miss)})
             </span>
           </div>

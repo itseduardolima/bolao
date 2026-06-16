@@ -71,7 +71,7 @@ export default function GameCard({
               {homeScore ?? 0} × {awayScore ?? 0}
             </span>
           ) : (
-            <span className="font-barlow text-xl font-bold text-muted">VS</span>
+            <span className="font-barlow text-xl font-bold text-secondary">VS</span>
           )}
         </div>
 
@@ -90,7 +90,7 @@ export default function GameCard({
       <div className="mt-4 border-t border-border pt-3">
         {prediction ? (
           <div className="flex items-center justify-between">
-            <span className="font-inter text-xs text-muted">
+            <span className="font-inter text-xs text-secondary">
               Seu palpite:{' '}
               <span className="text-secondary">
                 {prediction.homeScore} × {prediction.awayScore}
@@ -102,13 +102,13 @@ export default function GameCard({
                   'rounded-full px-2 py-0.5 font-inter text-xs font-semibold',
                   prediction.points === 3 && 'bg-accent-dim text-accent border border-accent-border',
                   prediction.points === 1 && 'bg-warning-dim text-warning border border-warning-border',
-                  prediction.points === 0 && 'bg-elevated text-muted'
+                  prediction.points === 0 && 'bg-elevated text-secondary'
                 )}
               >
                 {prediction.points === 3 ? '+3 pts' : prediction.points === 1 ? '+1 pt' : '0 pts'}
               </span>
             ) : (
-              <span className="font-inter text-xs text-muted">aguardando</span>
+              <span className="font-inter text-xs text-secondary">aguardando</span>
             )}
           </div>
         ) : isAuthenticated ? (
@@ -126,7 +126,7 @@ export default function GameCard({
             )}
           </span>
         ) : (
-          <span className="font-inter text-xs text-muted">Entre para palpitar</span>
+          <span className="font-inter text-xs text-secondary">Entre para palpitar</span>
         )}
       </div>
     </Link>

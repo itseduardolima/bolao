@@ -82,19 +82,19 @@ export default async function PerfilPage() {
 
       <div className="flex flex-wrap gap-6 mb-8 p-4 bg-elevated rounded-xl">
         <div className="flex flex-col gap-1">
-          <span className="font-inter text-[11px] uppercase tracking-widest text-muted">Pontos</span>
+          <span className="font-inter text-[11px] uppercase tracking-widest text-secondary">Pontos</span>
           <span className="font-barlow text-2xl font-bold text-accent">{totalPoints}</span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="font-inter text-[11px] uppercase tracking-widest text-muted">Exatos</span>
+          <span className="font-inter text-[11px] uppercase tracking-widest text-secondary">Exatos</span>
           <span className="font-barlow text-2xl font-bold text-secondary">{exactHits}</span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="font-inter text-[11px] uppercase tracking-widest text-muted">Vencedor</span>
+          <span className="font-inter text-[11px] uppercase tracking-widest text-secondary">Vencedor</span>
           <span className="font-barlow text-2xl font-bold text-secondary">{winnerHits}</span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="font-inter text-[11px] uppercase tracking-widest text-muted">Jogos</span>
+          <span className="font-inter text-[11px] uppercase tracking-widest text-secondary">Jogos</span>
           <span className="font-barlow text-2xl font-bold text-secondary">{gamesPlayed}</span>
         </div>
       </div>
@@ -104,7 +104,7 @@ export default async function PerfilPage() {
           const games = byPhase[phase]
           return (
             <section key={phase}>
-              <h3 className="font-barlow text-sm font-bold uppercase tracking-widest text-muted mb-3 border-b border-border pb-2">
+              <h3 className="font-barlow text-sm font-bold uppercase tracking-widest text-secondary mb-3 border-b border-border pb-2">
                 {phase}
               </h3>
               <div className="flex flex-col gap-1">
@@ -115,7 +115,7 @@ export default async function PerfilPage() {
                   const isScheduled = game.status === 'SCHEDULED'
 
                   let pointsBadge: React.ReactNode = (
-                    <span className="font-inter text-xs text-muted">—</span>
+                    <span className="font-inter text-xs text-secondary">—</span>
                   )
                   if (pred && (isFinished || pred.points !== null)) {
                     if (pred.points === 3) {
@@ -128,7 +128,7 @@ export default async function PerfilPage() {
                       )
                     } else if (pred.points === 0) {
                       pointsBadge = (
-                        <span className="font-inter text-xs text-muted">0 pts</span>
+                        <span className="font-inter text-xs text-secondary">0 pts</span>
                       )
                     }
                   }
@@ -148,7 +148,7 @@ export default async function PerfilPage() {
                     )
                   } else {
                     resultDisplay = (
-                      <span className="font-inter text-sm text-muted">—</span>
+                      <span className="font-inter text-sm text-secondary">—</span>
                     )
                   }
 
@@ -161,7 +161,7 @@ export default async function PerfilPage() {
                     )
                   } else {
                     predDisplay = (
-                      <span className="font-inter text-sm text-muted">—</span>
+                      <span className="font-inter text-sm text-secondary">—</span>
                     )
                   }
 
@@ -174,7 +174,7 @@ export default async function PerfilPage() {
                     )
                   } else if (isScheduled) {
                     statusBadge = (
-                      <span className="font-inter text-[10px] text-muted">
+                      <span className="font-inter text-[10px] text-secondary">
                         {formatGameDate(game.startsAt)} {formatGameTime(game.startsAt)}
                       </span>
                     )
@@ -217,7 +217,7 @@ export default async function PerfilPage() {
         })}
 
         {phases.length === 0 && (
-          <p className="font-inter text-sm text-muted">Nenhum jogo disponível ainda.</p>
+          <p className="font-inter text-sm text-secondary">Nenhum jogo disponível ainda.</p>
         )}
       </div>
     </Container>

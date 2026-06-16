@@ -15,7 +15,7 @@ const variantStyles: Record<BadgeVariant, string> = {
   FINISHED: 'bg-finished-dim text-finished',
   'points-exact': 'bg-accent-dim text-accent border border-accent-border',
   'points-winner': 'bg-warning-dim text-warning border border-warning-border',
-  'points-miss': 'bg-elevated text-muted',
+  'points-miss': 'bg-elevated text-secondary',
 }
 
 const statusLabels: Partial<Record<BadgeVariant, string>> = {

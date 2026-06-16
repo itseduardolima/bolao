@@ -65,7 +65,7 @@ export default async function GameDetailPage({
         <div className="mb-8 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <StatusBadge status={status} />
-            <span className="font-inter text-sm text-muted">{game.phase}</span>
+            <span className="font-inter text-sm text-secondary">{game.phase}</span>
           </div>
 
           <div className="flex items-center justify-between gap-6">
@@ -107,7 +107,7 @@ export default async function GameDetailPage({
                   <span className="font-barlow text-2xl font-bold text-secondary">
                     {formatGameTime(game.startsAt)}
                   </span>
-                  <span className="font-inter text-xs text-muted">
+                  <span className="font-inter text-xs text-secondary">
                     {formatGameDate(game.startsAt)}
                   </span>
                 </div>
@@ -134,7 +134,7 @@ export default async function GameDetailPage({
           </div>
 
           {(game.venue || game.city) && (
-            <p className="text-center font-inter text-xs text-muted">
+            <p className="text-center font-inter text-xs text-secondary">
               {[game.venue, game.city].filter(Boolean).join(' · ')}
             </p>
           )}
@@ -142,7 +142,7 @@ export default async function GameDetailPage({
 
         {/* Prediction section */}
         <div className="mb-8 rounded-xl border border-border bg-surface p-6">
-          <h2 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-muted">
+          <h2 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-secondary">
             Meu palpite
           </h2>
 
@@ -158,13 +158,13 @@ export default async function GameDetailPage({
 
           {userId && (status === 'LIVE' || status === 'FINISHED') && (
             <div className="space-y-3">
-              <p className="flex items-center gap-1.5 font-inter text-sm text-muted">
+              <p className="flex items-center gap-1.5 font-inter text-sm text-secondary">
                 <LockSimple size={14} weight="bold" />
                 Palpites encerrados
               </p>
               {prediction ? (
                 <div className="flex items-center justify-between rounded-lg bg-elevated px-4 py-3">
-                  <span className="font-inter text-xs text-muted">Seu palpite</span>
+                  <span className="font-inter text-xs text-secondary">Seu palpite</span>
                   <span className="font-barlow text-lg font-bold text-primary">
                     {prediction.homeScore} × {prediction.awayScore}
                   </span>
@@ -176,7 +176,7 @@ export default async function GameDetailPage({
                           'border border-accent-border bg-accent-dim text-accent',
                         prediction.points === 1 &&
                           'border border-warning-border bg-warning-dim text-warning',
-                        prediction.points === 0 && 'bg-elevated text-muted'
+                        prediction.points === 0 && 'bg-elevated text-secondary'
                       )}
                     >
                       {prediction.points === 3
@@ -188,7 +188,7 @@ export default async function GameDetailPage({
                   )}
                 </div>
               ) : (
-                <p className="font-inter text-xs text-muted">Você não enviou palpite.</p>
+                <p className="font-inter text-xs text-secondary">Você não enviou palpite.</p>
               )}
             </div>
           )}
@@ -205,7 +205,7 @@ export default async function GameDetailPage({
           )}
 
           {userId && status === 'SCHEDULED' && !canPredict && (
-            <p className="flex items-center gap-1.5 font-inter text-sm text-muted">
+            <p className="flex items-center gap-1.5 font-inter text-sm text-secondary">
               <LockSimple size={14} weight="bold" />
               Palpites encerrados
             </p>

@@ -54,7 +54,7 @@ export default function PredictionForm({
 
   if (isLocked) {
     return (
-      <p className="font-inter text-sm text-muted">Palpites encerrados para este jogo.</p>
+      <p className="font-inter text-sm text-secondary">Palpites encerrados para este jogo.</p>
     )
   }
 
@@ -102,7 +102,7 @@ export default function PredictionForm({
             />
           </div>
 
-          <span className="mb-4 font-barlow text-2xl font-bold text-muted">×</span>
+          <span className="mb-4 font-barlow text-2xl font-bold text-secondary">×</span>
 
           <div className="flex flex-col items-center gap-2">
             <span className="font-barlow text-sm font-bold uppercase tracking-wide text-secondary">

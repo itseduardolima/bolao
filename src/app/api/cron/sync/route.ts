@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createHash, timingSafeEqual } from 'crypto'
 import { syncGames } from '@/lib/sync'
 
 export const dynamic = 'force-dynamic'
 
+function safeCompare(a: string, b: string): boolean {
+  const ha = createHash('sha256').update(a).digest()
+  const hb = createHash('sha256').update(b).digest()
+  return timingSafeEqual(ha, hb)
+}
+
 export async function GET(req: NextRequest) {
-  const auth = req.headers.get('authorization')
+  const authHeader = req.headers.get('authorization')
   const expected = `Bearer ${process.env.CRON_SECRET}`
 
-  if (!auth || auth !== expected) {
+  if (!authHeader || !safeCompare(authHeader, expected)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

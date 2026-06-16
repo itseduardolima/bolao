@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import Container from '@/components/layout/Container'
 import SectionTitle from '@/components/layout/SectionTitle'
 import Avatar from '@/components/ui/Avatar'
+import { cn } from '@/lib/utils'
 export const dynamic = 'force-dynamic'
 
 type RankingRow = {
@@ -56,18 +57,18 @@ export default async function HomePage() {
       <SectionTitle className="mb-6">Ranking</SectionTitle>
 
       {ranking.length === 0 ? (
-        <p className="font-inter text-sm text-muted">Nenhum participante ainda.</p>
+        <p className="font-inter text-sm text-secondary">Nenhum participante ainda.</p>
       ) : (
         <div className="w-full overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-left w-8">#</th>
-                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-left">Participante</th>
-                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-center">Pontos</th>
-                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-center hidden sm:table-cell">Exatos</th>
-                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-center hidden sm:table-cell">Vencedor</th>
-                <th className="font-inter text-[11px] uppercase tracking-widest text-muted pb-3 text-center hidden sm:table-cell">Jogos</th>
+                <th className="font-inter text-[11px] uppercase tracking-widest text-secondary pb-3 text-left w-8">#</th>
+                <th className="font-inter text-[11px] uppercase tracking-widest text-secondary pb-3 text-left">Participante</th>
+                <th className="font-inter text-[11px] uppercase tracking-widest text-secondary pb-3 text-center">Pontos</th>
+                <th className="font-inter text-[11px] uppercase tracking-widest text-secondary pb-3 text-center hidden sm:table-cell">Exatos</th>
+                <th className="font-inter text-[11px] uppercase tracking-widest text-secondary pb-3 text-center hidden sm:table-cell">Vencedor</th>
+                <th className="font-inter text-[11px] uppercase tracking-widest text-secondary pb-3 text-center hidden sm:table-cell">Jogos</th>
               </tr>
             </thead>
             <tbody>
@@ -83,7 +84,7 @@ export default async function HomePage() {
                       <span
                         className={cn(
                           'text-sm',
-                          rankColors[rank] ?? 'text-muted text-sm'
+                          rankColors[rank] ?? 'text-secondary text-sm'
                         )}
                       >
                         {rank}
@@ -99,7 +100,7 @@ export default async function HomePage() {
                         {entry.nickname ? (
                           <span className="font-inter text-sm text-primary">{entry.nickname}</span>
                         ) : (
-                          <span className="font-inter text-sm text-muted">Sem apelido</span>
+                          <span className="font-inter text-sm text-secondary">Sem apelido</span>
                         )}
                       </div>
                     </td>
@@ -109,7 +110,7 @@ export default async function HomePage() {
                           {entry.totalPoints}
                         </span>
                       ) : (
-                        <span className="font-barlow text-xl text-muted">0</span>
+                        <span className="font-barlow text-xl text-secondary">0</span>
                       )}
                     </td>
                     <td className="py-3 text-center align-middle hidden sm:table-cell">

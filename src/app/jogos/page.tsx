@@ -1,119 +1,97 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { formatGameDate } from '@/lib/utils'
 import Container from '@/components/layout/Container'
-import SectionTitle from '@/components/layout/SectionTitle'
 import GameCard from '@/components/game/GameCard'
+import DateNav from '@/components/game/DateNav'
 import type { GameStatus } from '@/types'
-
-const PHASE_ORDER = [
-  'Fase de Grupos',
-  'Oitavas de Final',
-  'Quartas de Final',
-  'Semifinal',
-  'Disputa de Terceiro Lugar',
-  'Final',
-]
 
 export const revalidate = 60
 
-export default async function JogosPage() {
+function getDefaultDate(dates: string[]): string {
+  if (dates.length === 0) return new Date().toISOString().slice(0, 10)
+  const today = new Date().toISOString().slice(0, 10)
+  if (dates.includes(today)) return today
+  const future = dates.filter((d) => d >= today)
+  if (future.length > 0) return future[0]
+  return dates[dates.length - 1]
+}
+
+export default async function JogosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string }>
+}) {
+  const { date: dateParam } = await searchParams
   const session = await auth()
   const userId = session?.user?.id
 
-  const [games, userPredictions] = await Promise.all([
-    prisma.game.findMany({
-      orderBy: { startsAt: 'asc' },
-      select: {
-        id: true,
-        homeTeam: true,
-        awayTeam: true,
-        homeFlag: true,
-        awayFlag: true,
-        startsAt: true,
-        status: true,
-        homeScore: true,
-        awayScore: true,
-        phase: true,
-        groupName: true,
-      },
-    }),
-    userId
-      ? prisma.prediction.findMany({
-          where: { userId },
-          select: { gameId: true, homeScore: true, awayScore: true, points: true },
-        })
-      : Promise.resolve([]),
-  ])
+  const allGames = await prisma.game.findMany({
+    orderBy: { startsAt: 'asc' },
+    select: {
+      id: true,
+      homeTeam: true,
+      awayTeam: true,
+      homeFlag: true,
+      awayFlag: true,
+      startsAt: true,
+      status: true,
+      homeScore: true,
+      awayScore: true,
+      phase: true,
+    },
+  })
 
-  const predictionMap = new Map(
-    userPredictions.map((p) => [p.gameId, p])
-  )
+  const dates = [
+    ...new Set(allGames.map((g) => g.startsAt.toISOString().slice(0, 10))),
+  ]
 
-  // Group by phase → date
-  const byPhase = new Map<string, Map<string, typeof games>>()
-
-  for (const game of games) {
-    const dateKey = formatGameDate(game.startsAt)
-    if (!byPhase.has(game.phase)) {
-      byPhase.set(game.phase, new Map())
-    }
-    const phaseMap = byPhase.get(game.phase)!
-    if (!phaseMap.has(dateKey)) {
-      phaseMap.set(dateKey, [])
-    }
-    phaseMap.get(dateKey)!.push(game)
+  if (dates.length === 0) {
+    return (
+      <main>
+        <Container>
+          <p className="text-secondary">Nenhum jogo cadastrado ainda.</p>
+        </Container>
+      </main>
+    )
   }
 
-  const sortedPhases = [...byPhase.keys()].sort((a, b) => {
-    const ai = PHASE_ORDER.indexOf(a)
-    const bi = PHASE_ORDER.indexOf(b)
-    const av = ai === -1 ? Infinity : ai
-    const bv = bi === -1 ? Infinity : bi
-    if (av !== bv) return av - bv
-    return a.localeCompare(b)
-  })
+  const selectedDate =
+    dateParam && dates.includes(dateParam) ? dateParam : getDefaultDate(dates)
+
+  const dayGames = allGames.filter(
+    (g) => g.startsAt.toISOString().slice(0, 10) === selectedDate
+  )
+
+  const userPredictions = userId
+    ? await prisma.prediction.findMany({
+        where: { userId, gameId: { in: dayGames.map((g) => g.id) } },
+        select: { gameId: true, homeScore: true, awayScore: true, points: true },
+      })
+    : []
+
+  const predictionMap = new Map(userPredictions.map((p) => [p.gameId, p]))
 
   return (
     <main>
       <Container>
-        <SectionTitle className="mb-8">Jogos</SectionTitle>
+        <DateNav dates={dates} selectedDate={selectedDate} />
 
-        {sortedPhases.length === 0 && (
-          <p className="text-secondary">Nenhum jogo cadastrado ainda.</p>
+        {dayGames.length === 0 ? (
+          <p className="text-secondary">Nenhum jogo nesta data.</p>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {dayGames.map((game) => (
+              <GameCard
+                key={game.id}
+                {...game}
+                startsAt={game.startsAt.toISOString()}
+                status={game.status as GameStatus}
+                prediction={predictionMap.get(game.id) ?? null}
+                isAuthenticated={!!userId}
+              />
+            ))}
+          </div>
         )}
-
-        <div className="flex flex-col gap-10">
-          {sortedPhases.map((phase) => {
-            const dateGroups = byPhase.get(phase)!
-            return (
-              <section key={phase}>
-                <h3 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-muted">
-                  {phase}
-                </h3>
-                <div className="flex flex-col gap-6">
-                  {[...dateGroups.entries()].map(([dateKey, dayGames]) => (
-                    <div key={dateKey}>
-                      <p className="mb-3 font-inter text-xs text-muted">{dateKey}</p>
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        {dayGames.map((game) => (
-                          <GameCard
-                            key={game.id}
-                            {...game}
-                            startsAt={game.startsAt.toISOString()}
-                            status={game.status as GameStatus}
-                            prediction={predictionMap.get(game.id) ?? null}
-                            isAuthenticated={!!userId}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )
-          })}
-        </div>
       </Container>
     </main>
   )

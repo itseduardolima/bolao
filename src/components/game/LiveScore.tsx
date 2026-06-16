@@ -33,7 +33,7 @@ export default function LiveScore({
     },
     refetchInterval: (query) =>
       query.state.data?.status === 'LIVE' ? 30_000 : false,
-    enabled: initialStatus === 'LIVE',
+    enabled: true,
   })
 
   const score = data ?? { homeScore: initialHomeScore, awayScore: initialAwayScore }

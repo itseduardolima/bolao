@@ -4,7 +4,7 @@ import Container from './Container'
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-[#0a0a14]">
+    <header className="sticky top-0 z-50 border-b border-border bg-base-dark">
       <Container className="flex h-14 items-center justify-between py-0">
         <Link
           href="/"

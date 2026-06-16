@@ -17,6 +17,10 @@
   --color-warning: #ffd43b;
   --color-finished: #4dabf7;
   --color-scheduled: #868e96;
+  --color-base-dark: #0a0a14;
+  --color-finished-dim: #1a3a4a;
+  --color-warning-dim: #2a2a1a;
+  --color-warning-border: #ffd43b44;
 
   /* Font families */
   --font-barlow: "Barlow Condensed", Impact, sans-serif;

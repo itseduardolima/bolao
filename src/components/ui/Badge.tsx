@@ -12,9 +12,9 @@ type BadgeProps = {
 const variantStyles: Record<BadgeVariant, string> = {
   SCHEDULED: 'bg-elevated text-scheduled',
   LIVE: 'bg-accent-dim text-accent border border-accent-border animate-pulse-live',
-  FINISHED: 'bg-[#1a3a4a] text-finished',
+  FINISHED: 'bg-finished-dim text-finished',
   'points-exact': 'bg-accent-dim text-accent border border-accent-border',
-  'points-winner': 'bg-[#2a2a1a] text-warning border border-[#ffd43b44]',
+  'points-winner': 'bg-warning-dim text-warning border border-warning-border',
   'points-miss': 'bg-elevated text-muted',
 }
 

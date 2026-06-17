@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { Timer, CheckCircle, XCircle } from '@phosphor-icons/react'
 import { InputScore } from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
@@ -36,6 +37,7 @@ export default function PredictionForm({
     null
   )
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
 
   const startsAtMs = new Date(startsAt).getTime()
   const [msLeft, setMsLeft] = useState(() => startsAtMs - Date.now())
@@ -73,6 +75,7 @@ export default function PredictionForm({
       const result = await savePrediction(gameId, home, away)
       if ('success' in result) {
         setFeedback({ type: 'success', message: 'Palpite salvo!' })
+        router.refresh()
       } else {
         setFeedback({ type: 'error', message: result.error })
       }

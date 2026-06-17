@@ -6,6 +6,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { cn, formatGameTime, formatGameDate } from '@/lib/utils'
 import Container from '@/components/layout/Container'
+import BackButton from '@/components/ui/BackButton'
 import { StatusBadge } from '@/components/ui/Badge'
 import LiveScore from '@/components/game/LiveScore'
 import PredictionForm from '@/components/prediction/PredictionForm'
@@ -61,6 +62,8 @@ export default async function GameDetailPage({
   return (
     <main>
       <Container className="max-w-2xl">
+        <BackButton />
+
         {/* Game header */}
         <div className="mb-8 flex flex-col gap-4">
           <div className="flex items-center justify-between">

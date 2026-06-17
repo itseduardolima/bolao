@@ -72,6 +72,11 @@ export async function syncGames(force = false): Promise<SyncResult> {
   let errors = 0
 
   for (const match of matches) {
+    if (!match.homeTeam.name || !match.awayTeam.name) {
+      skipped++
+      continue
+    }
+
     try {
       const externalId = String(match.id)
       const status = mapStatus(match.status)

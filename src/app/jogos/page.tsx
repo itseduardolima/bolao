@@ -8,15 +8,15 @@ import type { GameStatus } from '@/types'
 
 export const revalidate = 60
 
-function toBRTDate(date: Date): string {
+function toLocalDate(date: Date): string {
   return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Sao_Paulo',
+    timeZone: 'America/Manaus',
   }).format(date)
 }
 
 function getDefaultDate(dates: string[]): string {
-  if (dates.length === 0) return toBRTDate(new Date())
-  const today = toBRTDate(new Date())
+  if (dates.length === 0) return toLocalDate(new Date())
+  const today = toLocalDate(new Date())
   if (dates.includes(today)) return today
   const future = dates.filter((d) => d >= today)
   if (future.length > 0) return future[0]
@@ -49,7 +49,7 @@ export default async function JogosPage({
   })
 
   const dates: string[] = Array.from(
-    new Set(allGames.map((g) => toBRTDate(g.startsAt)))
+    new Set(allGames.map((g) => toLocalDate(g.startsAt)))
   )
 
   if (dates.length === 0) {
@@ -66,7 +66,7 @@ export default async function JogosPage({
     dateParam && dates.includes(dateParam) ? dateParam : getDefaultDate(dates)
 
   const dayGames = allGames.filter(
-    (g) => toBRTDate(g.startsAt) === selectedDate
+    (g) => toLocalDate(g.startsAt) === selectedDate
   )
 
   const userPredictions = userId
@@ -81,7 +81,7 @@ export default async function JogosPage({
   return (
     <main>
       <Container>
-        <DateNav dates={dates} selectedDate={selectedDate} today={toBRTDate(new Date())} />
+        <DateNav dates={dates} selectedDate={selectedDate} today={toLocalDate(new Date())} />
 
         <div className="mb-3 flex justify-end">
           <SyncGamesButton />

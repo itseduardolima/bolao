@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import Container from '@/components/layout/Container'
 import SectionTitle from '@/components/layout/SectionTitle'
 import { formatGameDate, formatGameTime } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import type { GameStatus } from '@/types'
 
 export const revalidate = 30
@@ -80,134 +81,145 @@ export default async function PerfilPage() {
     <Container>
       <SectionTitle className="mb-4">Meus Palpites</SectionTitle>
 
-      <div className="flex flex-wrap gap-6 mb-8 p-4 bg-elevated rounded-xl">
-        <div className="flex flex-col gap-1">
-          <span className="font-inter text-[11px] uppercase tracking-widest text-secondary">Pontos</span>
-          <span className="font-barlow text-2xl font-bold text-accent">{totalPoints}</span>
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="font-inter text-[11px] uppercase tracking-widest text-secondary">Exatos</span>
-          <span className="font-barlow text-2xl font-bold text-secondary">{exactHits}</span>
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="font-inter text-[11px] uppercase tracking-widest text-secondary">Vencedor</span>
-          <span className="font-barlow text-2xl font-bold text-secondary">{winnerHits}</span>
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="font-inter text-[11px] uppercase tracking-widest text-secondary">Jogos</span>
-          <span className="font-barlow text-2xl font-bold text-secondary">{gamesPlayed}</span>
-        </div>
+      {/* Stats */}
+      <div className="mb-8 grid grid-cols-4 divide-x divide-border rounded-xl bg-elevated">
+        {[
+          { label: 'Pontos', value: totalPoints, accent: true },
+          { label: 'Exatos', value: exactHits },
+          { label: 'Vencedor', value: winnerHits },
+          { label: 'Jogos', value: gamesPlayed },
+        ].map(({ label, value, accent }) => (
+          <div key={label} className="flex flex-col items-center gap-1 px-2 py-4">
+            <span className="font-inter text-[10px] uppercase tracking-widest text-secondary">
+              {label}
+            </span>
+            <span
+              className={cn(
+                'font-barlow text-2xl font-bold',
+                accent ? 'text-accent' : 'text-primary'
+              )}
+            >
+              {value}
+            </span>
+          </div>
+        ))}
       </div>
 
+      {/* Game list */}
       <div className="flex flex-col gap-8">
         {phases.map((phase) => {
           const games = byPhase[phase]
           return (
             <section key={phase}>
-              <h3 className="font-barlow text-sm font-bold uppercase tracking-widest text-secondary mb-3 border-b border-border pb-2">
+              <h3 className="mb-2 border-b border-border pb-2 font-barlow text-sm font-bold uppercase tracking-widest text-secondary">
                 {phase}
               </h3>
-              <div className="flex flex-col gap-1">
+
+              {/* Column headers */}
+              <div className="mb-1 flex items-center gap-2 px-1">
+                <div className="min-w-0 flex-1" />
+                <div className="flex w-[104px] shrink-0 items-center justify-around">
+                  <span className="w-12 text-center font-inter text-[10px] uppercase tracking-wide text-secondary">
+                    Palpite
+                  </span>
+                  <span className="w-12 text-center font-inter text-[10px] uppercase tracking-wide text-secondary">
+                    Result.
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1" />
+                <div className="w-10 shrink-0 text-right font-inter text-[10px] uppercase tracking-wide text-secondary">
+                  Pts
+                </div>
+              </div>
+
+              <div className="flex flex-col">
                 {games.map((game) => {
                   const pred = predMap.get(game.id)
                   const isFinished = game.status === 'FINISHED'
                   const isLive = game.status === 'LIVE'
                   const isScheduled = game.status === 'SCHEDULED'
 
-                  let pointsBadge: React.ReactNode = (
-                    <span className="font-inter text-xs text-secondary">—</span>
-                  )
-                  if (pred && (isFinished || pred.points !== null)) {
-                    if (pred.points === 3) {
-                      pointsBadge = (
-                        <span className="font-inter text-xs font-semibold text-accent">+3 pts</span>
-                      )
-                    } else if (pred.points === 1) {
-                      pointsBadge = (
-                        <span className="font-inter text-xs font-semibold text-warning">+1 pt</span>
-                      )
-                    } else if (pred.points === 0) {
-                      pointsBadge = (
-                        <span className="font-inter text-xs text-secondary">0 pts</span>
-                      )
-                    }
-                  }
+                  const predScore = pred
+                    ? `${pred.homeScore}×${pred.awayScore}`
+                    : '—'
 
-                  let resultDisplay: React.ReactNode
-                  if (isFinished && game.homeScore !== null && game.awayScore !== null) {
-                    resultDisplay = (
-                      <span className="font-barlow font-bold text-accent">
-                        {game.homeScore} × {game.awayScore}
-                      </span>
-                    )
-                  } else if (isLive && game.homeScore !== null && game.awayScore !== null) {
-                    resultDisplay = (
-                      <span className="font-barlow font-bold text-warning">
-                        {game.homeScore} × {game.awayScore}
-                      </span>
-                    )
-                  } else {
-                    resultDisplay = (
-                      <span className="font-inter text-sm text-secondary">—</span>
-                    )
-                  }
+                  const resultScore =
+                    (isFinished || isLive) &&
+                    game.homeScore !== null &&
+                    game.awayScore !== null
+                      ? `${game.homeScore}×${game.awayScore}`
+                      : '—'
 
-                  let predDisplay: React.ReactNode
-                  if (pred) {
-                    predDisplay = (
-                      <span className="font-barlow font-bold text-secondary">
-                        {pred.homeScore} × {pred.awayScore}
-                      </span>
-                    )
-                  } else {
-                    predDisplay = (
-                      <span className="font-inter text-sm text-secondary">—</span>
-                    )
-                  }
-
-                  let statusBadge: React.ReactNode = null
-                  if (isLive) {
-                    statusBadge = (
-                      <span className="font-inter text-[10px] font-semibold uppercase tracking-wider text-warning bg-warning/10 px-1.5 py-0.5 rounded">
-                        AO VIVO
-                      </span>
-                    )
-                  } else if (isScheduled) {
-                    statusBadge = (
-                      <span className="font-inter text-[10px] text-secondary">
-                        {formatGameDate(game.startsAt)} {formatGameTime(game.startsAt)}
-                      </span>
-                    )
-                  }
+                  const pts = pred?.points ?? null
 
                   return (
                     <div
                       key={game.id}
-                      className="flex items-center gap-2 border-b border-border py-3 last:border-b-0"
+                      className="flex items-center gap-2 border-b border-border px-1 py-3 last:border-b-0"
                     >
-                      <div className="flex-1 text-right">
-                        <span className="font-barlow font-bold uppercase text-primary text-sm">
+                      {/* Home team */}
+                      <div className="min-w-0 flex-1 text-right">
+                        <span className="block truncate font-barlow text-sm font-bold uppercase text-primary">
                           {game.homeTeam}
                         </span>
-                      </div>
-
-                      <div className="flex flex-col items-center gap-0.5 w-32 shrink-0">
-                        <div className="flex items-center gap-3">
-                          <div className="w-14 text-center text-sm">{predDisplay}</div>
-                          <div className="w-14 text-center text-sm">{resultDisplay}</div>
-                        </div>
-                        {statusBadge && (
-                          <div className="text-center">{statusBadge}</div>
+                        {isScheduled && (
+                          <span className="block font-inter text-[10px] text-secondary">
+                            {formatGameDate(game.startsAt)} {formatGameTime(game.startsAt)}
+                          </span>
+                        )}
+                        {isLive && (
+                          <span className="font-inter text-[10px] font-semibold uppercase tracking-wider text-warning">
+                            Ao vivo
+                          </span>
                         )}
                       </div>
 
-                      <div className="flex-1 text-left">
-                        <span className="font-barlow font-bold uppercase text-primary text-sm">
+                      {/* Scores */}
+                      <div className="flex w-[104px] shrink-0 items-center justify-around">
+                        <span
+                          className={cn(
+                            'w-12 text-center font-barlow font-bold',
+                            pred ? 'text-secondary' : 'text-secondary/40'
+                          )}
+                        >
+                          {predScore}
+                        </span>
+                        <span
+                          className={cn(
+                            'w-12 text-center font-barlow font-bold',
+                            isLive
+                              ? 'text-warning'
+                              : isFinished && resultScore !== '—'
+                                ? 'text-accent'
+                                : 'text-secondary/40'
+                          )}
+                        >
+                          {resultScore}
+                        </span>
+                      </div>
+
+                      {/* Away team */}
+                      <div className="min-w-0 flex-1 text-left">
+                        <span className="block truncate font-barlow text-sm font-bold uppercase text-primary">
                           {game.awayTeam}
                         </span>
                       </div>
 
-                      <div className="w-14 text-right shrink-0">{pointsBadge}</div>
+                      {/* Points */}
+                      <div className="w-10 shrink-0 text-right">
+                        {pts === 3 && (
+                          <span className="font-inter text-xs font-semibold text-accent">+3</span>
+                        )}
+                        {pts === 1 && (
+                          <span className="font-inter text-xs font-semibold text-warning">+1</span>
+                        )}
+                        {pts === 0 && (
+                          <span className="font-inter text-xs text-secondary">0</span>
+                        )}
+                        {pts === null && pred && isFinished && (
+                          <span className="font-inter text-xs text-secondary">—</span>
+                        )}
+                      </div>
                     </div>
                   )
                 })}

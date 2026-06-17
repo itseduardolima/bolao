@@ -11,6 +11,7 @@ export function formatGameDate(date: Date | string): string {
     weekday: 'long',
     day: 'numeric',
     month: 'short',
+    timeZone: 'America/Sao_Paulo',
   }).format(d)
   return formatted.charAt(0).toUpperCase() + formatted.slice(1)
 }
@@ -20,6 +21,7 @@ export function formatGameTime(date: Date | string): string {
   return new Intl.DateTimeFormat('pt-BR', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'America/Sao_Paulo',
   }).format(d)
 }
 

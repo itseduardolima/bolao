@@ -54,7 +54,7 @@ export default function DateNav({ dates, selectedDate, today }: DateNavProps) {
       <button
         onClick={() => prevDate && navigate(prevDate)}
         disabled={!prevDate}
-        className="shrink-0 rounded-lg p-2 text-secondary transition-colors hover:bg-elevated hover:text-primary disabled:opacity-20"
+        className="hidden shrink-0 rounded-lg p-2 text-secondary transition-colors hover:bg-elevated hover:text-primary disabled:opacity-20 sm:block"
         aria-label="Dia anterior"
       >
         <CaretLeft size={18} weight="bold" />
@@ -103,7 +103,7 @@ export default function DateNav({ dates, selectedDate, today }: DateNavProps) {
       <button
         onClick={() => nextDate && navigate(nextDate)}
         disabled={!nextDate}
-        className="shrink-0 rounded-lg p-2 text-secondary transition-colors hover:bg-elevated hover:text-primary disabled:opacity-20"
+        className="hidden shrink-0 rounded-lg p-2 text-secondary transition-colors hover:bg-elevated hover:text-primary disabled:opacity-20 sm:block"
         aria-label="Próximo dia"
       >
         <CaretRight size={18} weight="bold" />

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { fetchMatches, mapStatus, mapStage } from '@/lib/football-data'
+import { fetchMatches, mapStatus, mapStage, translateTeamName } from '@/lib/football-data'
 import { calculatePoints } from '@/lib/scoring'
 
 export type SyncResult =
@@ -79,17 +79,20 @@ export async function syncGames(force = false): Promise<SyncResult> {
       const homeScore = match.score.fullTime.home
       const awayScore = match.score.fullTime.away
 
+      const homeTeamPT = translateTeamName(match.homeTeam.name)
+      const awayTeamPT = translateTeamName(match.awayTeam.name)
+
       const existing = await prisma.game.findUnique({
         where: { externalId },
-        select: { id: true, status: true, homeScore: true, awayScore: true },
+        select: { id: true, status: true, homeScore: true, awayScore: true, homeTeam: true, awayTeam: true },
       })
 
       if (!existing) {
         await prisma.game.create({
           data: {
             externalId,
-            homeTeam: match.homeTeam.name,
-            awayTeam: match.awayTeam.name,
+            homeTeam: homeTeamPT,
+            awayTeam: awayTeamPT,
             homeFlag: match.homeTeam.crest,
             awayFlag: match.awayTeam.crest,
             startsAt: new Date(match.utcDate),
@@ -108,15 +111,23 @@ export async function syncGames(force = false): Promise<SyncResult> {
       const scoreChanged =
         existing.homeScore !== homeScore || existing.awayScore !== awayScore
       const statusChanged = existing.status !== status
+      const nameChanged =
+        existing.homeTeam !== homeTeamPT || existing.awayTeam !== awayTeamPT
 
-      if (!scoreChanged && !statusChanged) {
+      if (!scoreChanged && !statusChanged && !nameChanged) {
         skipped++
         continue
       }
 
       await prisma.game.update({
         where: { externalId },
-        data: { status, homeScore, awayScore },
+        data: {
+          status,
+          homeScore,
+          awayScore,
+          homeTeam: translateTeamName(match.homeTeam.name),
+          awayTeam: translateTeamName(match.awayTeam.name),
+        },
       })
       updated++
 

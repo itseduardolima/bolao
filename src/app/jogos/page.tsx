@@ -6,7 +6,7 @@ import DateNav from '@/components/game/DateNav'
 import SyncGamesButton from '@/components/game/SyncGamesButton'
 import type { GameStatus } from '@/types'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 function toLocalDate(date: Date): string {
   return new Intl.DateTimeFormat('en-CA', {

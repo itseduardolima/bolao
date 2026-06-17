@@ -74,6 +74,7 @@ export default function GameCard({
                 initialStatus={status}
                 initialHomeScore={homeScore}
                 initialAwayScore={awayScore}
+                showSyncButton={false}
               />
             ) : (
               <span className="font-barlow text-[40px] font-black leading-none text-accent">

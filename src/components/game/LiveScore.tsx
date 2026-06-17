@@ -16,6 +16,7 @@ type LiveScoreProps = {
   initialStatus: GameStatus
   initialHomeScore: number | null
   initialAwayScore: number | null
+  showSyncButton?: boolean
 }
 
 export default function LiveScore({
@@ -23,6 +24,7 @@ export default function LiveScore({
   initialStatus,
   initialHomeScore,
   initialAwayScore,
+  showSyncButton = true,
 }: LiveScoreProps) {
   const [syncing, setSyncing] = useState(false)
   const queryClient = useQueryClient()
@@ -62,18 +64,20 @@ export default function LiveScore({
       <span className="font-barlow text-[40px] font-black leading-none text-accent">
         {score.homeScore} × {score.awayScore}
       </span>
-      <button
-        onClick={handleSync}
-        disabled={syncing}
-        className="flex items-center gap-1 font-inter text-xs text-secondary transition-colors hover:text-accent disabled:opacity-50"
-      >
-        <ArrowsClockwise
-          size={12}
-          weight="bold"
-          className={syncing ? 'animate-spin' : ''}
-        />
-        {syncing ? 'Sincronizando...' : 'Atualizar'}
-      </button>
+      {showSyncButton && (
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          className="flex items-center gap-1 font-inter text-xs text-secondary transition-colors hover:text-accent disabled:opacity-50"
+        >
+          <ArrowsClockwise
+            size={12}
+            weight="bold"
+            className={syncing ? 'animate-spin' : ''}
+          />
+          {syncing ? 'Sincronizando...' : 'Atualizar'}
+        </button>
+      )}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import Container from '@/components/layout/Container'
 import GameCard from '@/components/game/GameCard'
 import DateNav from '@/components/game/DateNav'
+import SyncGamesButton from '@/components/game/SyncGamesButton'
 import type { GameStatus } from '@/types'
 
 export const revalidate = 60
@@ -81,6 +82,10 @@ export default async function JogosPage({
     <main>
       <Container>
         <DateNav dates={dates} selectedDate={selectedDate} today={toBRTDate(new Date())} />
+
+        <div className="mb-3 flex justify-end">
+          <SyncGamesButton />
+        </div>
 
         {dayGames.length === 0 ? (
           <p className="text-secondary">Nenhum jogo nesta data.</p>

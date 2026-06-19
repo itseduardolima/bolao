@@ -1,4 +1,4 @@
-export type GameStatus = 'SCHEDULED' | 'LIVE' | 'FINISHED'
+export type GameStatus = 'SCHEDULED' | 'LIVE' | 'PAUSED' | 'FINISHED'
 
 export type Game = {
   id: string

@@ -23,7 +23,7 @@ export async function GET(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  if (game.status === 'LIVE') {
+  if (game.status === 'LIVE' || game.status === 'PAUSED') {
     const stale = Date.now() - game.updatedAt.getTime() > STALE_THRESHOLD_MS
     if (stale && !syncingNow) {
       syncingNow = true

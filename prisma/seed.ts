@@ -161,7 +161,14 @@ async function main() {
       venue: string | null
       homeTeam: { name: string; crest: string }
       awayTeam: { name: string; crest: string }
-      score: { fullTime: { home: number | null; away: number | null } }
+      score: {
+        fullTime: { home: number | null; away: number | null }
+        regularTime?: { home: number | null; away: number | null }
+        halfTime?: { home: number | null; away: number | null }
+        extraTime?: { home: number | null; away: number | null }
+        penalties?: { home: number | null; away: number | null }
+        duration?: string
+      }
     }>
   }
   console.log(`  ${matches.length} partidas recebidas.`)
@@ -172,31 +179,44 @@ async function main() {
   for (const m of matches.filter((m) => m.homeTeam?.name && m.awayTeam?.name)) {
     const status = STATUS_MAP[m.status] ?? 'SCHEDULED'
     const phase = STAGE_MAP[m.stage] ?? m.stage
-    const homeScore = m.score.fullTime.home
-    const awayScore = m.score.fullTime.away
+    const homeScore = m.score.fullTime.home ?? m.score.regularTime?.home ?? null
+    const awayScore = m.score.fullTime.away ?? m.score.regularTime?.away ?? null
+    const halfTimeHome = m.score.halfTime?.home ?? null
+    const halfTimeAway = m.score.halfTime?.away ?? null
+    const duration = m.score.duration ?? null
+    const extraTimeHome = m.score.extraTime?.home ?? null
+    const extraTimeAway = m.score.extraTime?.away ?? null
+    const penaltiesHome = m.score.penalties?.home ?? null
+    const penaltiesAway = m.score.penalties?.away ?? null
+
+    const scoreData = {
+      status, homeScore, awayScore,
+      halfTimeHome, halfTimeAway,
+      duration, extraTimeHome, extraTimeAway,
+      penaltiesHome, penaltiesAway,
+      homeTeam: translate(m.homeTeam.name),
+      awayTeam: translate(m.awayTeam.name),
+    }
+
     const existing = await prisma.game.findUnique({ where: { externalId: String(m.id) } })
     if (!existing) {
       await prisma.game.create({
         data: {
           externalId: String(m.id),
-          homeTeam: translate(m.homeTeam.name),
-          awayTeam: translate(m.awayTeam.name),
           homeFlag: m.homeTeam.crest,
           awayFlag: m.awayTeam.crest,
           startsAt: new Date(m.utcDate),
           venue: m.venue,
           phase,
           groupName: m.group,
-          status,
-          homeScore,
-          awayScore,
+          ...scoreData,
         },
       })
       created++
     } else {
       await prisma.game.update({
         where: { externalId: String(m.id) },
-        data: { status, homeScore, awayScore, homeTeam: translate(m.homeTeam.name), awayTeam: translate(m.awayTeam.name) },
+        data: scoreData,
       })
       updated++
     }

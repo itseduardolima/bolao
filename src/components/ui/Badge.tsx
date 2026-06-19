@@ -12,6 +12,7 @@ type BadgeProps = {
 const variantStyles: Record<BadgeVariant, string> = {
   SCHEDULED: 'bg-elevated text-scheduled',
   LIVE: 'bg-accent-dim text-accent border border-accent-border animate-pulse-live',
+  PAUSED: 'bg-warning-dim text-warning border border-warning-border',
   FINISHED: 'bg-finished-dim text-finished',
   'points-exact': 'bg-accent-dim text-accent border border-accent-border',
   'points-winner': 'bg-warning-dim text-warning border border-warning-border',
@@ -21,6 +22,7 @@ const variantStyles: Record<BadgeVariant, string> = {
 const statusLabels: Partial<Record<BadgeVariant, string>> = {
   SCHEDULED: 'Agendado',
   LIVE: 'Ao vivo',
+  PAUSED: 'Intervalo',
   FINISHED: 'Encerrado',
 }
 

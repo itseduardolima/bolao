@@ -14,6 +14,9 @@ export type ApiMatch = {
     fullTime: { home: number | null; away: number | null }
     regularTime?: { home: number | null; away: number | null }
     halfTime?: { home: number | null; away: number | null }
+    extraTime?: { home: number | null; away: number | null }
+    penalties?: { home: number | null; away: number | null }
+    duration?: string
   }
 }
 
@@ -112,7 +115,7 @@ const STATUS_MAP: Record<string, string> = {
   SCHEDULED: 'SCHEDULED',
   TIMED: 'SCHEDULED',
   IN_PLAY: 'LIVE',
-  PAUSED: 'LIVE',
+  PAUSED: 'PAUSED',
   FINISHED: 'FINISHED',
   SUSPENDED: 'SCHEDULED',
   POSTPONED: 'SCHEDULED',

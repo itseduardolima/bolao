@@ -37,6 +37,13 @@ export default async function GameDetailPage({
         status: true,
         homeScore: true,
         awayScore: true,
+        halfTimeHome: true,
+        halfTimeAway: true,
+        duration: true,
+        extraTimeHome: true,
+        extraTimeAway: true,
+        penaltiesHome: true,
+        penaltiesAway: true,
         phase: true,
         venue: true,
         city: true,
@@ -53,7 +60,7 @@ export default async function GameDetailPage({
   if (!game) notFound()
 
   const status = game.status as GameStatus
-  const showScore = status === 'LIVE' || status === 'FINISHED'
+  const showScore = status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED'
   const canPredict =
     !!userId &&
     status === 'SCHEDULED' &&
@@ -91,9 +98,9 @@ export default async function GameDetailPage({
             </div>
 
             {/* Score / time */}
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center gap-2">
               {showScore ? (
-                status === 'LIVE' ? (
+                status === 'LIVE' || status === 'PAUSED' ? (
                   <LiveScore
                     gameId={id}
                     initialStatus={status}
@@ -101,9 +108,23 @@ export default async function GameDetailPage({
                     initialAwayScore={game.awayScore}
                   />
                 ) : (
-                  <span className="font-barlow text-[40px] font-black leading-none text-accent">
-                    {game.homeScore} × {game.awayScore}
-                  </span>
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="font-barlow text-[40px] font-black leading-none text-accent">
+                      {game.homeScore} × {game.awayScore}
+                    </span>
+                    {game.duration === 'PENALTY_SHOOTOUT' &&
+                      game.penaltiesHome !== null &&
+                      game.penaltiesAway !== null && (
+                        <span className="rounded-full border border-border bg-elevated px-2.5 py-0.5 font-inter text-xs text-secondary">
+                          Pênaltis: {game.penaltiesHome} × {game.penaltiesAway}
+                        </span>
+                      )}
+                    {game.duration === 'EXTRA_TIME' && (
+                      <span className="rounded-full border border-border bg-elevated px-2.5 py-0.5 font-inter text-xs text-secondary">
+                        Prorrogação
+                      </span>
+                    )}
+                  </div>
                 )
               ) : (
                 <div className="flex flex-col items-center gap-1">
@@ -159,7 +180,7 @@ export default async function GameDetailPage({
             </Link>
           )}
 
-          {userId && (status === 'LIVE' || status === 'FINISHED') && (
+          {userId && (status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED') && (
             <div className="space-y-3">
               <p className="flex items-center gap-1.5 font-inter text-sm text-secondary">
                 <LockSimple size={14} weight="bold" />
@@ -216,7 +237,7 @@ export default async function GameDetailPage({
         </div>
 
         {/* Participant predictions (LIVE or FINISHED) */}
-        {(status === 'LIVE' || status === 'FINISHED') && (
+        {(status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED') && (
           <ParticipantPredictions
             gameId={id}
             currentUserId={userId}

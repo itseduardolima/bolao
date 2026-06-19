@@ -33,7 +33,7 @@ export default function LiveScore({
     },
     refetchInterval: (query) => {
       const status = query.state.data?.status
-      if (status === 'LIVE') return 5 * 60_000
+      if (status === 'LIVE' || status === 'PAUSED') return 5 * 60_000
       if (status === 'SCHEDULED') return 30_000
       return false
     },

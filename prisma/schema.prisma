@@ -57,10 +57,17 @@ model Game {
   city        String?
   phase       String
   groupName   String?
-  status      String       @default("SCHEDULED")
-  homeScore   Int?
-  awayScore   Int?
-  createdAt   DateTime     @default(now())
+  status          String       @default("SCHEDULED")
+  homeScore       Int?
+  awayScore       Int?
+  halfTimeHome    Int?
+  halfTimeAway    Int?
+  duration        String?
+  extraTimeHome   Int?
+  extraTimeAway   Int?
+  penaltiesHome   Int?
+  penaltiesAway   Int?
+  createdAt       DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   predictions Prediction[]
 }

@@ -35,7 +35,7 @@ export default function GameCard({
   isAuthenticated,
   className,
 }: GameCardProps) {
-  const showScore = status === 'LIVE' || status === 'FINISHED'
+  const showScore = status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED'
 
   return (
     <Link
@@ -68,7 +68,7 @@ export default function GameCard({
 
         <div className="flex min-w-[80px] flex-col items-center">
           {showScore ? (
-            status === 'LIVE' ? (
+            status === 'LIVE' || status === 'PAUSED' ? (
               <LiveScore
                 gameId={id}
                 initialStatus={status}

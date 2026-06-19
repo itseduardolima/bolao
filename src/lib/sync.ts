@@ -89,6 +89,13 @@ export async function syncGames(force = false): Promise<SyncResult> {
         match.score.fullTime.away ??
         match.score.regularTime?.away ??
         null
+      const halfTimeHome = match.score.halfTime?.home ?? null
+      const halfTimeAway = match.score.halfTime?.away ?? null
+      const duration = match.score.duration ?? null
+      const extraTimeHome = match.score.extraTime?.home ?? null
+      const extraTimeAway = match.score.extraTime?.away ?? null
+      const penaltiesHome = match.score.penalties?.home ?? null
+      const penaltiesAway = match.score.penalties?.away ?? null
 
       const homeTeamPT = translateTeamName(match.homeTeam.name)
       const awayTeamPT = translateTeamName(match.awayTeam.name)
@@ -113,6 +120,13 @@ export async function syncGames(force = false): Promise<SyncResult> {
             status,
             homeScore,
             awayScore,
+            halfTimeHome,
+            halfTimeAway,
+            duration,
+            extraTimeHome,
+            extraTimeAway,
+            penaltiesHome,
+            penaltiesAway,
           },
         })
         created++
@@ -136,6 +150,13 @@ export async function syncGames(force = false): Promise<SyncResult> {
           status,
           homeScore,
           awayScore,
+          halfTimeHome,
+          halfTimeAway,
+          duration,
+          extraTimeHome,
+          extraTimeAway,
+          penaltiesHome,
+          penaltiesAway,
           homeTeam: translateTeamName(match.homeTeam.name),
           awayTeam: translateTeamName(match.awayTeam.name),
         },

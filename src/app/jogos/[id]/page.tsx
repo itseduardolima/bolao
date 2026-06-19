@@ -215,9 +215,13 @@ export default async function GameDetailPage({
           )}
         </div>
 
-        {/* Participant predictions (FINISHED only) */}
-        {status === 'FINISHED' && (
-          <ParticipantPredictions gameId={id} currentUserId={userId} />
+        {/* Participant predictions (LIVE or FINISHED) */}
+        {(status === 'LIVE' || status === 'FINISHED') && (
+          <ParticipantPredictions
+            gameId={id}
+            currentUserId={userId}
+            showStats={status === 'FINISHED'}
+          />
         )}
       </Container>
     </main>

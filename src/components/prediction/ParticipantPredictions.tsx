@@ -4,11 +4,13 @@ import Avatar from '@/components/ui/Avatar'
 type ParticipantPredictionsProps = {
   gameId: string
   currentUserId?: string
+  showStats?: boolean
 }
 
 export default async function ParticipantPredictions({
   gameId,
   currentUserId,
+  showStats = true,
 }: ParticipantPredictionsProps) {
   const predictions = await prisma.prediction.findMany({
     where: { gameId },
@@ -75,31 +77,33 @@ export default async function ParticipantPredictions({
         </div>
       </div>
 
-      <div>
-        <h3 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-secondary">
-          Estatísticas
-        </h3>
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-5">
-          <div className="flex justify-between font-inter text-sm">
-            <span className="text-secondary">Placar exato</span>
-            <span className="font-semibold text-accent">
-              {exact} pessoa{exact !== 1 ? 's' : ''} ({pct(exact)})
-            </span>
-          </div>
-          <div className="flex justify-between font-inter text-sm">
-            <span className="text-secondary">Acertaram o vencedor</span>
-            <span className="font-semibold text-warning">
-              {winner} pessoa{winner !== 1 ? 's' : ''} ({pct(winner)})
-            </span>
-          </div>
-          <div className="flex justify-between font-inter text-sm">
-            <span className="text-secondary">Erraram</span>
-            <span className="font-semibold text-secondary">
-              {miss} pessoa{miss !== 1 ? 's' : ''} ({pct(miss)})
-            </span>
+      {showStats && (
+        <div>
+          <h3 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-secondary">
+            Estatísticas
+          </h3>
+          <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-5">
+            <div className="flex justify-between font-inter text-sm">
+              <span className="text-secondary">Placar exato</span>
+              <span className="font-semibold text-accent">
+                {exact} pessoa{exact !== 1 ? 's' : ''} ({pct(exact)})
+              </span>
+            </div>
+            <div className="flex justify-between font-inter text-sm">
+              <span className="text-secondary">Acertaram o vencedor</span>
+              <span className="font-semibold text-warning">
+                {winner} pessoa{winner !== 1 ? 's' : ''} ({pct(winner)})
+              </span>
+            </div>
+            <div className="flex justify-between font-inter text-sm">
+              <span className="text-secondary">Erraram</span>
+              <span className="font-semibold text-secondary">
+                {miss} pessoa{miss !== 1 ? 's' : ''} ({pct(miss)})
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

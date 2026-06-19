@@ -81,8 +81,14 @@ export async function syncGames(force = false): Promise<SyncResult> {
       const externalId = String(match.id)
       const status = mapStatus(match.status)
       const phase = mapStage(match.stage)
-      const homeScore = match.score.fullTime.home
-      const awayScore = match.score.fullTime.away
+      const homeScore =
+        match.score.fullTime.home ??
+        match.score.regularTime?.home ??
+        null
+      const awayScore =
+        match.score.fullTime.away ??
+        match.score.regularTime?.away ??
+        null
 
       const homeTeamPT = translateTeamName(match.homeTeam.name)
       const awayTeamPT = translateTeamName(match.awayTeam.name)

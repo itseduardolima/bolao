@@ -11,10 +11,9 @@ export type ApiMatch = {
   homeTeam: { name: string; crest: string }
   awayTeam: { name: string; crest: string }
   score: {
-    fullTime: {
-      home: number | null
-      away: number | null
-    }
+    fullTime: { home: number | null; away: number | null }
+    regularTime?: { home: number | null; away: number | null }
+    halfTime?: { home: number | null; away: number | null }
   }
 }
 

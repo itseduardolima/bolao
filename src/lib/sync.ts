@@ -102,7 +102,7 @@ export async function syncGames(force = false): Promise<SyncResult> {
 
       const existing = await prisma.game.findUnique({
         where: { externalId },
-        select: { id: true, status: true, homeScore: true, awayScore: true, homeTeam: true, awayTeam: true },
+        select: { id: true, status: true, homeScore: true, awayScore: true, homeTeam: true, awayTeam: true, halfTimeHome: true, halfTimeAway: true, duration: true },
       })
 
       if (!existing) {
@@ -134,7 +134,11 @@ export async function syncGames(force = false): Promise<SyncResult> {
       }
 
       const scoreChanged =
-        existing.homeScore !== homeScore || existing.awayScore !== awayScore
+        existing.homeScore !== homeScore ||
+        existing.awayScore !== awayScore ||
+        existing.halfTimeHome !== halfTimeHome ||
+        existing.halfTimeAway !== halfTimeAway ||
+        existing.duration !== duration
       const statusChanged = existing.status !== status
       const nameChanged =
         existing.homeTeam !== homeTeamPT || existing.awayTeam !== awayTeamPT

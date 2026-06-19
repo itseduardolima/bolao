@@ -34,22 +34,23 @@ export default function LiveScore({
     refetchInterval: (query) => {
       const status = query.state.data?.status
       if (status === 'LIVE' || status === 'PAUSED') return 5 * 60_000
-      if (status === 'SCHEDULED') return 30_000
       return false
     },
   })
 
-  const score = data ?? { homeScore: initialHomeScore, awayScore: initialAwayScore }
+  const current = data ?? { status: initialStatus, homeScore: initialHomeScore, awayScore: initialAwayScore }
 
-  if (score.homeScore === null || score.awayScore === null) return null
+  if (current.homeScore === null || current.awayScore === null) return null
+
+  const label = current.status === 'PAUSED' ? 'Intervalo' : 'Ao vivo'
 
   return (
     <div className="flex flex-col items-center gap-1">
       <span className="font-barlow text-[40px] font-black leading-none text-accent">
-        {score.homeScore} × {score.awayScore}
+        {current.homeScore} × {current.awayScore}
       </span>
       <span className="font-inter text-[10px] uppercase tracking-widest text-secondary opacity-60">
-        ao vivo
+        {label}
       </span>
     </div>
   )

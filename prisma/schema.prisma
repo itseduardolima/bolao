@@ -7,16 +7,44 @@ datasource db {
 }
 
 model User {
-  id            String       @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String
-  email         String       @unique
+  email         String        @unique
   emailVerified DateTime?
   image         String?
-  nickname      String?      @unique
-  hasNickname   Boolean      @default(false)
-  createdAt     DateTime     @default(now())
+  nickname      String?       @unique
+  hasNickname   Boolean       @default(false)
+  createdAt     DateTime      @default(now())
   accounts      Account[]
   predictions   Prediction[]
+  ownedGroups   Group[]       @relation("OwnedGroups")
+  groupMembers  GroupMember[]
+}
+
+model Group {
+  id         String        @id @default(cuid())
+  name       String
+  inviteCode String        @unique
+  ownerId    String
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  owner      User          @relation("OwnedGroups", fields: [ownerId], references: [id], onDelete: Cascade)
+  members    GroupMember[]
+
+  @@index([ownerId])
+}
+
+model GroupMember {
+  id       String   @id @default(cuid())
+  groupId  String
+  userId   String
+  role     String   @default("MEMBER")
+  joinedAt DateTime @default(now())
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
 }
 
 model Account {

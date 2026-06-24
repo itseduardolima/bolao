@@ -86,7 +86,7 @@ export default function CreateGroupForm() {
                 cursor: nameValid ? 'pointer' : 'not-allowed',
               }}
             >
-              Próximo →
+              Próximo
             </button>
           </div>
         ) : (

@@ -40,7 +40,7 @@ export default async function GruposPage() {
   })
 
   return (
-    <div className="mx-auto max-w-5xl px-8 py-9">
+    <div className="mx-auto max-w-5xl px-4 sm:px-8 py-9">
       {/* Header */}
       <div className="font-barlow text-[12px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
         Suas ligas

@@ -115,6 +115,7 @@ export default function CreateGroupForm() {
                 border: `1px solid ${cpfValid ? 'rgba(0,255,135,.4)' : 'rgba(255,255,255,.1)'}`,
                 borderRadius: 10, color: '#fff',
                 font: '500 14px Inter,sans-serif', outline: 'none', letterSpacing: '.02em',
+                fontSize: 16
               }}
             />
             <div style={{ fontFamily: 'Inter,sans-serif', fontSize: 11, lineHeight: 1.4, color: 'rgba(255,255,255,.3)', fontStyle: 'italic', marginTop: 8 }}>

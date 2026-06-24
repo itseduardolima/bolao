@@ -6,12 +6,12 @@ import { GROUP_NAME_MIN, GROUP_NAME_MAX } from '@/lib/group-constants'
 
 const PRICE_DISPLAY = process.env.NEXT_PUBLIC_GROUP_PRICE_DISPLAY ?? 'R$ 6,00'
 
-function formatCpf(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 11)
-  return digits
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+function maskCpf(v: string): string {
+  const d = v.replace(/\D/g, '').slice(0, 11)
+  if (d.length > 9) return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6, 9) + '-' + d.slice(9)
+  if (d.length > 6) return d.slice(0, 3) + '.' + d.slice(3, 6) + '.' + d.slice(6)
+  if (d.length > 3) return d.slice(0, 3) + '.' + d.slice(3)
+  return d
 }
 
 export default function CreateGroupForm() {
@@ -24,37 +24,27 @@ export default function CreateGroupForm() {
 
   const trimmedName = name.trim()
   const nameValid = trimmedName.length >= GROUP_NAME_MIN && trimmedName.length <= GROUP_NAME_MAX
-  const cpfValid = cpf.replace(/\D/g, '').length === 11
+  const cpfDigits = cpf.replace(/\D/g, '')
+  const cpfValid = cpfDigits.length === 11
 
-  function handleCpfChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setCpf(formatCpf(e.target.value))
-  }
-
-  async function handlePay(e: React.FormEvent) {
-    e.preventDefault()
-    if (!nameValid || !cpfValid || loading) return
+  async function handlePay() {
+    if (!cpfValid || loading) return
     setError(null)
     setLoading(true)
     try {
       const res = await fetch('/api/asaas/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ groupName: trimmedName, cpf: cpf.replace(/\D/g, '') }),
+        body: JSON.stringify({ groupName: trimmedName, cpf: cpfDigits }),
       })
       const data = await res.json()
-      if (!res.ok) {
-        setError(data.error ?? 'Erro ao criar cobrança')
-        return
-      }
-      sessionStorage.setItem(
-        `gp_${data.paymentId}`,
-        JSON.stringify({
-          pixCode: data.pixCode,
-          pixQrCodeImage: data.pixQrCodeImage,
-          amount: data.amount,
-          groupName: trimmedName,
-        })
-      )
+      if (!res.ok) { setError(data.error ?? 'Erro ao criar cobrança'); return }
+      sessionStorage.setItem(`gp_${data.paymentId}`, JSON.stringify({
+        pixCode: data.pixCode,
+        pixQrCodeImage: data.pixQrCodeImage,
+        amount: data.amount,
+        groupName: trimmedName,
+      }))
       router.push(`/grupos/pagamento/${data.paymentId}`)
     } catch {
       setError('Erro de conexão. Tente novamente.')
@@ -64,70 +54,103 @@ export default function CreateGroupForm() {
   }
 
   return (
-    <div className="bg-surface border border-border rounded-xl p-[18px] pb-5">
-      <div className="font-barlow text-[11px] font-semibold uppercase tracking-[.2em] text-[rgba(255,255,255,.42)]">
-        Criar nova liga
-      </div>
-
-      {step === 1 ? (
-        <div className="flex gap-2 mt-3">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Nome da liga"
-            maxLength={GROUP_NAME_MAX}
-            className="flex-1 h-[42px] px-[14px] bg-base border border-white/10 rounded-[10px] text-primary font-inter text-[14px] font-medium outline-none focus:border-white/25 transition-colors placeholder:text-muted"
-          />
-          <button
-            type="button"
-            disabled={!nameValid}
-            onClick={() => { setError(null); setStep(2) }}
-            className="h-[42px] px-[20px] bg-accent text-black border-none rounded-[10px] font-inter text-[14px] font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:opacity-85"
-          >
-            Próximo →
-          </button>
+    <div style={{ background: '#16162a', border: '1px solid rgba(255,255,255,.06)', borderRadius: 16, padding: 18 }}>
+        <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: '.2em', color: 'rgba(255,255,255,.42)', textTransform: 'uppercase' }}>
+          Criar nova liga
         </div>
-      ) : (
-        <form onSubmit={handlePay}>
-          <button
-            type="button"
-            onClick={() => { setStep(1); setError(null) }}
-            className="mt-[10px] font-inter text-[12px] text-[rgba(255,255,255,.42)] hover:text-[rgba(255,255,255,.7)] transition-colors cursor-pointer"
-          >
-            ← {trimmedName}
-          </button>
 
-          <div className="mt-[10px]">
-            <label className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.55)]">
+        {step === 1 ? (
+          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nome da liga"
+              maxLength={GROUP_NAME_MAX}
+              style={{
+                flex: 1, minWidth: 0, height: 42, padding: '0 14px',
+                background: '#0f0f1a',
+                border: `1px solid ${nameValid ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.1)'}`,
+                borderRadius: 10, color: '#fff',
+                font: '500 14px Inter,sans-serif', outline: 'none',
+              }}
+            />
+            <button
+              type="button"
+              disabled={!nameValid}
+              onClick={() => { setError(null); setStep(2) }}
+              style={{
+                flexShrink: 0, height: 42, padding: '0 20px', border: 'none',
+                borderRadius: 12, fontFamily: 'Inter,sans-serif', fontSize: 14, fontWeight: 700,
+                background: '#00ff87', color: '#0f0f1a',
+                opacity: nameValid ? 1 : 0.4,
+                cursor: nameValid ? 'pointer' : 'not-allowed',
+              }}
+            >
+              Próximo →
+            </button>
+          </div>
+        ) : (
+          <>
+            <div
+              onClick={() => { setStep(1); setError(null) }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,.42)', cursor: 'pointer', marginTop: 13 }}
+            >
+              <span style={{ display: 'inline-block', width: 6, height: 6, borderLeft: '2px solid currentColor', borderBottom: '2px solid currentColor', transform: 'rotate(45deg)' }} />
+              {trimmedName}
+            </div>
+
+            <div style={{ fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,.55)', marginTop: 14 }}>
               CPF do pagador
-            </label>
+            </div>
             <input
               value={cpf}
-              onChange={handleCpfChange}
+              onChange={(e) => setCpf(maskCpf(e.target.value))}
               placeholder="000.000.000-00"
               inputMode="numeric"
               autoFocus
-              className="mt-[6px] w-full h-[42px] px-[14px] bg-base border border-white/10 rounded-[10px] text-primary font-inter text-[14px] font-medium outline-none focus:border-white/25 transition-colors placeholder:text-muted"
+              style={{
+                width: '100%', boxSizing: 'border-box', height: 42, padding: '0 14px', marginTop: 7,
+                background: '#0f0f1a',
+                border: `1px solid ${cpfValid ? 'rgba(0,255,135,.4)' : 'rgba(255,255,255,.1)'}`,
+                borderRadius: 10, color: '#fff',
+                font: '500 14px Inter,sans-serif', outline: 'none', letterSpacing: '.02em',
+              }}
             />
-          </div>
+            <div style={{ fontFamily: 'Inter,sans-serif', fontSize: 11, lineHeight: 1.4, color: 'rgba(255,255,255,.3)', fontStyle: 'italic', marginTop: 8 }}>
+              Usado apenas para emissão da cobrança PIX. Não armazenamos seu CPF.
+            </div>
 
-          <div className="mt-[4px] font-inter text-[11px] text-[rgba(255,255,255,.3)]">
-            Usado apenas para emissão da cobrança PIX. Não armazenamos seu CPF.
-          </div>
+            <button
+              type="button"
+              disabled={!cpfValid || loading}
+              onClick={handlePay}
+              style={{
+                width: '100%', height: 44, marginTop: 16, border: 'none',
+                borderRadius: 12, fontFamily: 'Inter,sans-serif', fontSize: 14, fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
+                background: '#00ff87', color: '#0f0f1a',
+                opacity: (!cpfValid || loading) ? (loading ? 0.8 : 0.4) : 1,
+                cursor: loading ? 'wait' : cpfValid ? 'pointer' : 'not-allowed',
+              }}
+            >
+              {loading && (
+                <span style={{
+                  width: 15, height: 15, border: '2px solid rgba(15,15,26,.35)',
+                  borderTopColor: '#0f0f1a', borderRadius: '50%', display: 'inline-block',
+                  animation: 'spin .7s linear infinite',
+                }} />
+              )}
+              {loading ? 'Gerando cobrança…' : `Pagar ${PRICE_DISPLAY} via PIX`}
+            </button>
 
-          <button
-            type="submit"
-            disabled={!cpfValid || loading}
-            className="mt-[14px] w-full h-[44px] bg-accent text-black border-none rounded-[10px] font-inter text-[14px] font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:opacity-85"
-          >
-            {loading ? 'Gerando cobrança...' : `Pagar ${PRICE_DISPLAY} via PIX`}
-          </button>
-
-          {error && (
-            <div className="font-inter text-[12px] text-error mt-2">{error}</div>
-          )}
-        </form>
-      )}
+            {error && (
+              <div style={{ fontFamily: 'Inter,sans-serif', fontSize: 12, color: '#ff4d6d', marginTop: 8 }}>
+                {error}
+              </div>
+            )}
+          </>
+        )}
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }

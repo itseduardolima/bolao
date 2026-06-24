@@ -1,17 +1,13 @@
-const BASE_URL =
-  process.env.ASAAS_ENV === 'production'
-    ? 'https://api.asaas.com/api/v3'
-    : 'https://sandbox.asaas.com/api/v3'
+function buildBaseUrl() {
+  const raw = process.env.ASAAS_ENV === 'production'
+    ? (process.env.ASAAS_BASE_URL ?? 'https://api.asaas.com')
+    : 'https://api-sandbox.asaas.com'
+  return raw.replace(/\/+$/, '') + '/v3'
+}
+const BASE_URL = buildBaseUrl()
 
 async function call(path: string, opts?: RequestInit) {
   const apiKey = process.env.ASAAS_API_KEY
-  console.log('[asaas] call', path, {
-    env: process.env.ASAAS_ENV,
-    keyPresent: !!apiKey,
-    keyLength: apiKey?.length ?? 0,
-    keyPrefix: apiKey?.slice(0, 10) ?? '(empty)',
-  })
-
   const res = await fetch(`${BASE_URL}${path}`, {
     ...opts,
     headers: {
@@ -20,9 +16,12 @@ async function call(path: string, opts?: RequestInit) {
       ...(opts?.headers ?? {}),
     },
   })
-  const data = await res.json()
+  let data: unknown
+  const text = await res.text()
+  try { data = JSON.parse(text) } catch { data = null }
   if (!res.ok) {
-    const msg = data?.errors?.[0]?.description ?? `Asaas error ${res.status}`
+    const d = data as Record<string, unknown> | null
+    const msg = (d as { errors?: { description: string }[] })?.errors?.[0]?.description ?? `Asaas error ${res.status}: ${text.slice(0, 120)}`
     throw new Error(msg)
   }
   return data

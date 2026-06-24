@@ -10,12 +10,13 @@ Site de bolão entre amigos para a Copa do Mundo 2026. Sem apostas ou prêmios f
 
 | Camada | Tecnologia |
 |--------|-----------|
-| Framework | Next.js 15 (App Router) + TypeScript |
-| Banco de dados | SQLite via Prisma + Turso (serverless) |
+| Framework | Next.js 16 (App Router) + React 19 + TypeScript |
+| Banco de dados | SQLite via Prisma 7 + Turso/libSQL (serverless) |
 | Autenticação | Auth.js v5 (`next-auth@beta`) — Google OAuth |
 | API de jogos | football-data.org (plano gratuito, competição `WC`) |
+| Pagamentos | Asaas — cobrança PIX para criação de ligas |
 | Deploy | Vercel + Vercel Cron |
-| Estilo | Tailwind CSS (sem biblioteca de componentes) |
+| Estilo | Tailwind CSS v4 (sem biblioteca de componentes) |
 | Ícones | Phosphor Icons (`@phosphor-icons/react`), estilo Bold |
 | Fontes | Barlow Condensed (títulos/placares) + Inter (corpo) |
 | Fetching/Cache | TanStack Query (React Query v5) |
@@ -45,10 +46,18 @@ Site de bolão entre amigos para a Copa do Mundo 2026. Sem apostas ou prêmios f
 | Rota | Descrição | Acesso |
 |------|-----------|--------|
 | `/` | Ranking geral de todos os participantes | Público |
-| `/jogos` | Lista de jogos agrupados por fase e data | Público |
+| `/jogos` | Lista de jogos por data, com palpites | Público |
 | `/jogos/[id]` | Detalhes do jogo + formulário de palpite | Autenticado |
+| `/grupos` | Ligas privadas do usuário; criação via PIX | Autenticado |
+| `/grupos/[id]` | Ranking e membros de uma liga | Autenticado |
+| `/grupos/entrar/[code]` | Landing de convite | Público |
+| `/grupos/pagamento/[paymentId]` | Aguarda confirmação do PIX | Autenticado |
+| `/pontuacao` | Explicação das regras de pontuação | Público |
 | `/perfil` | Meus palpites e pontuação detalhada | Autenticado |
 | `/onboarding` | Escolha de nickname no primeiro acesso | Autenticado (sem nickname) |
+| `/api/asaas/checkout` | Cria cobrança PIX no Asaas | Autenticado |
+| `/api/asaas/status/[paymentId]` | Polling de status do pagamento | Autenticado |
+| `/subscriptions/webhook` | Webhook do Asaas (confirma pagamento e cria grupo) | Público (token-protected) |
 | `/api/cron/sync` | Endpoint interno para sync de jogos e resultados | Interno (`CRON_SECRET`) |
 | `/api/games/[id]/live` | Placar ao vivo para polling client-side | Público |
 | `/api/nickname` | Check de disponibilidade + salvar nickname | Autenticado |
@@ -61,13 +70,51 @@ Site de bolão entre amigos para a Copa do Mundo 2026. Sem apostas ou prêmios f
 
 ### User
 ```prisma
-id          String   @id
-name        String
-email       String   @unique
-image       String?
-nickname    String?  @unique   // 3–20 chars, /^[a-zA-Z0-9_]{3,20}$/
-hasNickname Boolean  @default(false)
-createdAt   DateTime @default(now())
+id            String   @id
+name          String
+email         String   @unique
+image         String?
+nickname      String?  @unique   // 3–20 chars, /^[a-zA-Z0-9_]{3,20}$/
+hasNickname   Boolean  @default(false)
+createdAt     DateTime @default(now())
+ownedGroups   Group[]
+groupMembers  GroupMember[]
+groupPayments GroupPayment[]
+```
+
+### Group
+```prisma
+id         String   @id @default(cuid())
+name       String
+inviteCode String   @unique
+ownerId    String
+createdAt  DateTime @default(now())
+updatedAt  DateTime @updatedAt
+```
+
+### GroupMember
+```prisma
+id       String   @id @default(cuid())
+groupId  String
+userId   String
+role     String   @default("MEMBER")  // OWNER | MEMBER
+joinedAt DateTime @default(now())
+
+@@unique([groupId, userId])
+```
+
+### GroupPayment
+```prisma
+id        String    @id @default(cuid())
+userId    String
+groupName String
+asaasId   String    @unique   // ID da cobrança no Asaas (pay_xxx)
+status    String    @default("PENDING")  // PENDING | PAID | EXPIRED | CANCELLED
+groupId   String?                        // preenchido após grupo ser criado
+pixCode   String?                        // código PIX copia-e-cola
+expiresAt DateTime?
+createdAt DateTime  @default(now())
+updatedAt DateTime  @updatedAt
 ```
 
 ### Game
@@ -139,6 +186,14 @@ updatedAt DateTime @updatedAt
 - Colunas: posição, avatar, nickname, pontos, exatos, vencedor, jogos
 - Detalhes em `.specs/ranking.md`
 
+### Ligas (grupos privados)
+- Rankings privados entre amigos — o palpite no bolão geral vale automaticamente em todas as ligas
+- **Criação paga:** R$ 6,00 via PIX (processado pelo Asaas); grupo só é criado após confirmação do webhook
+- Entrada por código de convite (8 caracteres, alfabeto sem ambiguidade)
+- Dono pode regenerar o código, remover membros e excluir o grupo
+- Limites: 20 grupos criados por usuário, 50 grupos participados, 100 membros por grupo
+- Webhook atômico: `updateMany WHERE status=PENDING` impede criação dupla em retentativas
+
 ---
 
 ## Integração com API (football-data.org)
@@ -183,11 +238,17 @@ Jogo termina
 | Variável | Descrição |
 |----------|-----------|
 | `DATABASE_URL` | URL do banco Turso (SQLite serverless) |
+| `DATABASE_AUTH_TOKEN` | Token de autenticação do Turso |
 | `AUTH_SECRET` | Secret do Auth.js |
 | `AUTH_GOOGLE_ID` | Client ID do Google OAuth |
 | `AUTH_GOOGLE_SECRET` | Client Secret do Google OAuth |
 | `FOOTBALL_DATA_API_KEY` | Token da football-data.org |
 | `CRON_SECRET` | Secret para autenticar chamadas ao cron |
+| `ASAAS_ENV` | `sandbox` ou `production` |
+| `ASAAS_API_KEY` | Chave da API Asaas (escape `$` inicial com `\$` no `.env.local`) |
+| `ASAAS_WEBHOOK_TOKEN` | Token do webhook Asaas (painel → Integrações → Webhooks) |
+| `GROUP_PRICE_CENTS` | Valor da liga em centavos (ex: `600` = R$ 6,00) |
+| `NEXT_PUBLIC_GROUP_PRICE_DISPLAY` | Texto exibido no botão de pagamento (ex: `R$ 6,00`) |
 
 ---
 
@@ -196,10 +257,10 @@ Jogo termina
 - Chat ou comentários entre participantes
 - Notificações (email/push) sobre jogos ou resultados
 - Palpites especiais (campeão, semifinalistas, artilheiro)
-- Múltiplos bolões / grupos separados
 - Painel admin manual de resultados
 - Troca de nickname após onboarding
 - Modo claro (light theme)
+- Transferência de propriedade de liga
 
 ---
 
@@ -215,3 +276,4 @@ Jogo termina
 | `.specs/sync-api.md` | football-data.org, cron job, retry, mapeamento |
 | `.specs/design.md` | Identidade visual, paleta, tipografia, componentes |
 | `.specs/frontend-arquitetura.md` | Estrutura de pastas, hooks, TanStack Query, tipos |
+| `docs/pagamento-grupos-asaas.md` | Fluxo completo de pagamento PIX para criação de ligas |

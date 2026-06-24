@@ -38,7 +38,7 @@ export default function DateNav({ dates, selectedDate, today }: DateNavProps) {
   }
 
   return (
-    <div className="mb-6 flex gap-[7px] overflow-x-auto">
+    <div className="mb-6 flex gap-[7px] overflow-x-auto scrollbar-hide">
       {dates.map((date) => {
         const { weekday, day } = formatDateLabel(date)
         const isSelected = date === selectedDate

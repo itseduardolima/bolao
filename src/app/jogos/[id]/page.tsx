@@ -61,6 +61,7 @@ export default async function GameDetailPage({
   if (!game) notFound()
 
   const status = game.status as GameStatus
+  const gameDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Manaus' }).format(game.startsAt)
   const showScore = status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED'
   const canPredict =
     !!userId &&
@@ -84,7 +85,7 @@ export default async function GameDetailPage({
     <main>
       <Container className="max-w-2xl">
         <Link
-          href="/jogos"
+          href={`/jogos?date=${gameDate}`}
           className="inline-flex items-center gap-[7px] font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)] hover:text-secondary transition-colors"
         >
           <span className="inline-block w-[7px] h-[7px] border-l-2 border-b-2 border-current rotate-45" />

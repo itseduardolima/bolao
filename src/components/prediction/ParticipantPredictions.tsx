@@ -33,7 +33,7 @@ export default async function ParticipantPredictions({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h3 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-secondary">
+        <h3 className="my-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-secondary">
           Palpites dos participantes
         </h3>
         <div className="flex flex-col gap-2">

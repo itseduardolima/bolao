@@ -59,6 +59,13 @@ export default function PredictionForm({
 
   const isCountdown = msLeft < COUNTDOWN_THRESHOLD_MS
 
+  const isEditing = initialHomeScore != null && initialAwayScore != null
+  const bothFilled = homeScore.trim() !== '' && awayScore.trim() !== ''
+  const hasChanged =
+    homeScore.trim() !== String(initialHomeScore ?? '') ||
+    awayScore.trim() !== String(initialAwayScore ?? '')
+  const canSubmit = !isPending && bothFilled && (!isEditing || hasChanged)
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const home = parseInt(homeScore, 10)
@@ -116,8 +123,8 @@ export default function PredictionForm({
 
         <button
           type="submit"
-          disabled={isPending}
-          className="w-full h-[48px] mt-[18px] bg-accent text-black rounded-[12px] font-inter text-[14px] font-bold flex items-center justify-center gap-[8px] disabled:opacity-70 transition-opacity"
+          disabled={!canSubmit}
+          className="w-full h-[48px] mt-[18px] bg-accent text-black rounded-[12px] font-inter text-[14px] font-bold flex items-center justify-center gap-[8px] disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
         >
           {isPending && (
             <span className="w-[15px] h-[15px] border-2 border-[rgba(0,0,0,.3)] border-t-black rounded-full inline-block animate-spin" />

@@ -1,3 +1,6 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatGameTime } from '@/lib/utils'
@@ -49,10 +52,39 @@ export default function GameCard({
   prediction,
   isAuthenticated,
 }: GameCardProps) {
-  const showScore = status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED'
-  const scoreColor = showScore ? '#fff' : 'rgba(255,255,255,.3)'
+  const startsAtMs = new Date(startsAt).getTime()
+
+  const [effectiveStatus, setEffectiveStatus] = useState<GameStatus>(() =>
+    status === 'SCHEDULED' && Date.now() >= startsAtMs ? 'LIVE' : status
+  )
+  const [effectiveHomeScore, setEffectiveHomeScore] = useState<number | null>(() =>
+    status === 'SCHEDULED' && Date.now() >= startsAtMs ? 0 : homeScore
+  )
+  const [effectiveAwayScore, setEffectiveAwayScore] = useState<number | null>(() =>
+    status === 'SCHEDULED' && Date.now() >= startsAtMs ? 0 : awayScore
+  )
+
+  useEffect(() => {
+    if (status !== 'SCHEDULED') return
+    const remaining = startsAtMs - Date.now()
+    if (remaining <= 0) {
+      setEffectiveStatus('LIVE')
+      setEffectiveHomeScore(0)
+      setEffectiveAwayScore(0)
+      return
+    }
+    const timer = setTimeout(() => {
+      setEffectiveStatus('LIVE')
+      setEffectiveHomeScore(0)
+      setEffectiveAwayScore(0)
+    }, remaining)
+    return () => clearTimeout(timer)
+  }, [status, startsAtMs])
+
+  const showScore = effectiveStatus === 'LIVE' || effectiveStatus === 'PAUSED' || effectiveStatus === 'FINISHED'
+  const scoreColor = effectiveStatus === 'LIVE' ? '#00ff87' : showScore ? '#fff' : 'rgba(255,255,255,.3)'
   const scoreOrTime = showScore
-    ? `${homeScore ?? 0} - ${awayScore ?? 0}`
+    ? `${effectiveHomeScore ?? 0} - ${effectiveAwayScore ?? 0}`
     : 'VS'
 
   return (
@@ -62,7 +94,7 @@ export default function GameCard({
     >
       <div className="flex items-center justify-between">
         <span className="font-[Barlow_Condensed] text-[10px] font-semibold tracking-[.12em] text-[rgba(255,255,255,.42)] uppercase">{phase}</span>
-        <StatusBadge status={status} />
+        <StatusBadge status={effectiveStatus} />
       </div>
 
       <div className="flex items-center justify-between mt-[14px]">
@@ -85,7 +117,7 @@ export default function GameCard({
 
       <div className="mt-[14px] pt-[12px] border-t border-border flex items-center justify-between min-h-[24px]">
         <span className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)]">
-          {status === 'SCHEDULED' ? formatGameTime(startsAt) : ''}
+          {effectiveStatus === 'SCHEDULED' ? formatGameTime(startsAt) : ''}
         </span>
         <div className="flex items-center gap-[8px]">
           {prediction ? (
@@ -95,7 +127,7 @@ export default function GameCard({
               </span>
               {prediction.points !== null && <PointsBadge points={prediction.points} />}
             </>
-          ) : isAuthenticated && status === 'SCHEDULED' ? (
+          ) : isAuthenticated && effectiveStatus === 'SCHEDULED' ? (
             <span className="font-inter text-[12px] font-semibold text-accent cursor-pointer">Palpitar →</span>
           ) : isAuthenticated ? (
             <span className="font-inter text-[12px] font-semibold text-[rgba(255,255,255,.55)]">Ver detalhes →</span>

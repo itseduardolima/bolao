@@ -10,7 +10,7 @@ import PredictionForm from '@/components/prediction/PredictionForm'
 import ParticipantPredictions from '@/components/prediction/ParticipantPredictions'
 import type { GameStatus } from '@/types'
 
-export const revalidate = 30
+export const dynamic = 'force-dynamic'
 
 function toCode(name: string) {
   return name.slice(0, 3).toUpperCase()

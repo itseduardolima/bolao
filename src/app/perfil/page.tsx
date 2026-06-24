@@ -6,7 +6,7 @@ import Container from '@/components/layout/Container'
 import Avatar from '@/components/ui/Avatar'
 import type { GameStatus } from '@/types'
 
-export const revalidate = 30
+export const dynamic = 'force-dynamic'
 
 type GameRow = {
   id: string

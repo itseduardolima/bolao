@@ -54,8 +54,8 @@ export async function upsertCustomer(
   cpf: string
 ): Promise<AsaasCustomer> {
   const cpfClean = cpf.replace(/\D/g, '')
-  const search = await call(`/customers?email=${encodeURIComponent(email)}&limit=1`)
-  if (search.data?.length > 0) return search.data[0] as AsaasCustomer
+  const search = await call(`/customers?email=${encodeURIComponent(email)}&limit=1`) as { data?: AsaasCustomer[] }
+  if (search.data && search.data.length > 0) return search.data[0]
   return call('/customers', {
     method: 'POST',
     body: JSON.stringify({

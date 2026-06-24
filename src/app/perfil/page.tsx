@@ -1,10 +1,9 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Container from '@/components/layout/Container'
-import SectionTitle from '@/components/layout/SectionTitle'
-import { formatGameDate, formatGameTime } from '@/lib/utils'
-import { cn } from '@/lib/utils'
+import Avatar from '@/components/ui/Avatar'
 import type { GameStatus } from '@/types'
 
 export const revalidate = 30
@@ -25,6 +24,79 @@ type PredictionRow = {
   homeScore: number
   awayScore: number
   points: number | null
+}
+
+function PointsBadge({ points }: { points: number }) {
+  if (points === 3) return <span className="font-barlow text-[12px] font-bold text-accent bg-[rgba(0,255,135,.12)] rounded-[6px] px-[10px] py-[3px]">+3</span>
+  if (points === 1) return <span className="font-barlow text-[12px] font-bold text-warning bg-[rgba(245,158,11,.14)] rounded-[6px] px-[10px] py-[3px]">+1</span>
+  return <span className="font-barlow text-[12px] font-bold text-[rgba(255,255,255,.5)] bg-[rgba(255,255,255,.07)] rounded-[6px] px-[10px] py-[3px]">0</span>
+}
+
+function PhaseSection({ phase, rows, predMap }: { phase: string; rows: GameRow[]; predMap: Map<string, PredictionRow> }) {
+  const phasePreds = rows.map(r => predMap.get(r.id)).filter(Boolean)
+  const phasePts = phasePreds.reduce((s, p) => s + (p!.points ?? 0), 0)
+  const meta = `${phasePreds.length} palpites · ${phasePts} pts`
+
+  return (
+    <div className="bg-surface border border-border rounded-[14px] overflow-hidden">
+      <div className="flex items-center justify-between px-[20px] py-[16px]">
+        <div className="flex items-baseline gap-[12px]">
+          <span className="font-barlow text-[17px] font-bold text-primary">{phase}</span>
+          <span className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)]">{meta}</span>
+        </div>
+      </div>
+
+      <div className="grid [grid-template-columns:1fr_90px_90px_80px] gap-[10px] px-[20px] py-[8px] font-[Barlow_Condensed] text-[10px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase border-t border-[rgba(255,255,255,.06)]">
+        <span>Jogo</span>
+        <span className="text-center">Resultado</span>
+        <span className="text-center">Palpite</span>
+        <span className="text-right">Pts</span>
+      </div>
+
+      {rows.map((game) => {
+        const pred = predMap.get(game.id)
+        const isLive = game.status === 'LIVE' || game.status === 'PAUSED'
+        const isFinished = game.status === 'FINISHED'
+        const hasResult = isFinished || isLive
+
+        const realDisplay = hasResult && game.homeScore !== null && game.awayScore !== null
+          ? `${game.homeScore} - ${game.awayScore}`
+          : '—'
+        const realColor = hasResult ? '#fff' : 'rgba(255,255,255,.3)'
+        const guessDisplay = pred ? `${pred.homeScore} - ${pred.awayScore}` : '—'
+
+        return (
+          <div key={game.id} className="grid [grid-template-columns:1fr_90px_90px_80px] gap-[10px] px-[20px] py-[12px] items-center border-t border-[rgba(255,255,255,.05)]">
+            <div className="flex items-center gap-[9px]">
+              <span className="font-barlow text-[14px] font-semibold text-primary">
+                {game.homeTeam.slice(0, 3).toUpperCase()} × {game.awayTeam.slice(0, 3).toUpperCase()}
+              </span>
+              {isLive && (
+                <span className="inline-flex items-center gap-[4px] font-[Barlow_Condensed] text-[8px] font-semibold tracking-[.1em] text-accent bg-[rgba(0,255,135,.12)] rounded-[4px] px-[6px] py-[2px] uppercase">
+                  ● Ao vivo
+                </span>
+              )}
+            </div>
+            <span className="text-center font-barlow text-[14px] font-semibold" style={{ color: realColor }}>
+              {realDisplay}
+            </span>
+            <span className="text-center font-barlow text-[14px] font-semibold text-[rgba(255,255,255,.7)]">
+              {guessDisplay}
+            </span>
+            <div className="flex justify-end">
+              {pred && pred.points !== null ? (
+                <PointsBadge points={pred.points} />
+              ) : pred && !hasResult ? (
+                <span className="font-inter text-[12px] text-[rgba(255,255,255,.42)]">—</span>
+              ) : !pred ? (
+                <Link href={`/jogos/${game.id}`} className="font-inter text-[12px] font-bold text-accent">Palpitar</Link>
+              ) : null}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 export default async function PerfilPage() {
@@ -79,158 +151,41 @@ export default async function PerfilPage() {
 
   return (
     <Container>
-      <SectionTitle className="mb-4">Meus Palpites</SectionTitle>
-
-      {/* Stats */}
-      <div className="mb-8 grid grid-cols-4 divide-x divide-border rounded-xl bg-elevated">
-        {[
-          { label: 'Pontos', value: totalPoints, accent: true },
-          { label: 'Exatos', value: exactHits },
-          { label: 'Vencedor', value: winnerHits },
-          { label: 'Jogos', value: gamesPlayed },
-        ].map(({ label, value, accent }) => (
-          <div key={label} className="flex flex-col items-center gap-1 px-2 py-4">
-            <span className="font-inter text-[10px] uppercase tracking-widest text-secondary">
-              {label}
-            </span>
-            <span
-              className={cn(
-                'font-barlow text-2xl font-bold',
-                accent ? 'text-accent' : 'text-primary'
-              )}
-            >
-              {value}
-            </span>
+      <div className="flex items-center gap-[14px]">
+        <Avatar src={session.user.image ?? null} name={session.user.nickname ?? session.user.name ?? 'U'} size={54} />
+        <div>
+          <div className="font-[Barlow_Condensed] text-[12px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
+            Meus palpites
           </div>
-        ))}
+          <h1 className="font-barlow text-[32px] font-extrabold text-primary mt-[3px] leading-none">
+            {session.user.nickname ?? session.user.name ?? 'Você'}
+          </h1>
+        </div>
       </div>
 
-      {/* Game list */}
-      <div className="flex flex-col gap-8">
-        {phases.map((phase) => {
-          const games = byPhase[phase]
-          return (
-            <section key={phase}>
-              <h3 className="mb-2 border-b border-border pb-2 font-barlow text-sm font-bold uppercase tracking-widest text-secondary">
-                {phase}
-              </h3>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-[14px] mt-[26px]">
+        <div className="bg-surface border border-border rounded-[14px] p-[20px]">
+          <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase">Pontos</div>
+          <div className="font-barlow text-[34px] font-extrabold text-accent mt-[10px] leading-none">{totalPoints}</div>
+        </div>
+        <div className="bg-surface border border-border rounded-[14px] p-[20px]">
+          <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase">Acertos exatos</div>
+          <div className="font-barlow text-[34px] font-extrabold text-primary mt-[10px] leading-none">{exactHits}</div>
+        </div>
+        <div className="bg-surface border border-border rounded-[14px] p-[20px]">
+          <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase">Acertos de vencedor</div>
+          <div className="font-barlow text-[34px] font-extrabold text-primary mt-[10px] leading-none">{winnerHits}</div>
+        </div>
+        <div className="bg-surface border border-border rounded-[14px] p-[20px]">
+          <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase">Jogos palpitados</div>
+          <div className="font-barlow text-[34px] font-extrabold text-primary mt-[10px] leading-none">{gamesPlayed}</div>
+        </div>
+      </div>
 
-              {/* Column headers */}
-              <div className="mb-1 flex items-center gap-2 px-1">
-                <div className="min-w-0 flex-1" />
-                <div className="flex w-[104px] shrink-0 items-center justify-around">
-                  <span className="w-12 text-center font-inter text-[10px] uppercase tracking-wide text-secondary">
-                    Palpite
-                  </span>
-                  <span className="w-12 text-center font-inter text-[10px] uppercase tracking-wide text-secondary">
-                    Result.
-                  </span>
-                </div>
-                <div className="min-w-0 flex-1" />
-                <div className="w-10 shrink-0 text-right font-inter text-[10px] uppercase tracking-wide text-secondary">
-                  Pts
-                </div>
-              </div>
-
-              <div className="flex flex-col">
-                {games.map((game) => {
-                  const pred = predMap.get(game.id)
-                  const isFinished = game.status === 'FINISHED'
-                  const isLive = game.status === 'LIVE'
-                  const isScheduled = game.status === 'SCHEDULED'
-
-                  const predScore = pred
-                    ? `${pred.homeScore}×${pred.awayScore}`
-                    : '—'
-
-                  const resultScore =
-                    (isFinished || isLive) &&
-                    game.homeScore !== null &&
-                    game.awayScore !== null
-                      ? `${game.homeScore}×${game.awayScore}`
-                      : '—'
-
-                  const pts = pred?.points ?? null
-
-                  return (
-                    <div
-                      key={game.id}
-                      className="flex items-center gap-2 border-b border-border px-1 py-3 last:border-b-0"
-                    >
-                      {/* Home team */}
-                      <div className="min-w-0 flex-1 text-right">
-                        <span className="block truncate font-barlow text-sm font-bold uppercase text-primary">
-                          {game.homeTeam}
-                        </span>
-                        {isScheduled && (
-                          <span className="block font-inter text-[10px] text-secondary">
-                            {formatGameDate(game.startsAt)} {formatGameTime(game.startsAt)}
-                          </span>
-                        )}
-                        {isLive && (
-                          <span className="font-inter text-[10px] font-semibold uppercase tracking-wider text-warning">
-                            Ao vivo
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Scores */}
-                      <div className="flex w-[104px] shrink-0 items-center justify-around">
-                        <span
-                          className={cn(
-                            'w-12 text-center font-barlow font-bold',
-                            pred ? 'text-secondary' : 'text-secondary/40'
-                          )}
-                        >
-                          {predScore}
-                        </span>
-                        <span
-                          className={cn(
-                            'w-12 text-center font-barlow font-bold',
-                            isLive
-                              ? 'text-warning'
-                              : isFinished && resultScore !== '—'
-                                ? 'text-accent'
-                                : 'text-secondary/40'
-                          )}
-                        >
-                          {resultScore}
-                        </span>
-                      </div>
-
-                      {/* Away team */}
-                      <div className="min-w-0 flex-1 text-left">
-                        <span className="block truncate font-barlow text-sm font-bold uppercase text-primary">
-                          {game.awayTeam}
-                        </span>
-                      </div>
-
-                      {/* Points */}
-                      <div className="w-10 shrink-0 text-right">
-                        {pts === 3 && (
-                          <span className="font-inter text-xs font-semibold text-accent">+3</span>
-                        )}
-                        {pts === 1 && (
-                          <span className="font-inter text-xs font-semibold text-warning">+1</span>
-                        )}
-                        {pts === 0 && (
-                          <span className="font-inter text-xs text-secondary">0</span>
-                        )}
-                        {pts === null && pred && isFinished && (
-                          <span className="font-inter text-xs text-secondary">—</span>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </section>
-          )
-        })}
-
-        {phases.length === 0 && (
-          <p className="font-inter text-sm text-secondary">Nenhum jogo disponível ainda.</p>
-        )}
+      <div className="mt-[26px] flex flex-col gap-[12px]">
+        {phases.map((phase) => (
+          <PhaseSection key={phase} phase={phase} rows={byPhase[phase]} predMap={predMap} />
+        ))}
       </div>
     </Container>
   )

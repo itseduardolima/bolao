@@ -1,195 +1,94 @@
 import Container from '@/components/layout/Container'
-import SectionTitle from '@/components/layout/SectionTitle'
-import { CheckCircle, XCircle, Equals } from '@phosphor-icons/react/dist/ssr'
 
-const examples = [
-  {
-    result: '2 × 1',
-    prediction: '2 × 1',
-    points: 3,
-    reason: 'Placar exato',
-  },
-  {
-    result: '2 × 1',
-    prediction: '3 × 1',
-    points: 1,
-    reason: 'Acertou o vencedor',
-  },
-  {
-    result: '2 × 1',
-    prediction: '1 × 2',
-    points: 0,
-    reason: 'Errou',
-  },
-  {
-    result: '1 × 1',
-    prediction: '1 × 1',
-    points: 3,
-    reason: 'Placar exato',
-  },
-  {
-    result: '1 × 1',
-    prediction: '2 × 2',
-    points: 1,
-    reason: 'Acertou o empate',
-  },
-  {
-    result: '1 × 1',
-    prediction: '2 × 1',
-    points: 0,
-    reason: 'Errou',
-  },
-  {
-    result: '1 × 1 (pên.)',
-    prediction: '1 × 1',
-    points: 3,
-    reason: 'Placar do tempo normal conta',
-  },
-  {
-    result: '1 × 1 (pên.)',
-    prediction: '2 × 2',
-    points: 1,
-    reason: 'Acertou o empate no tempo normal',
-  },
+const EXAMPLES = [
+  { result: '2 - 1', prediction: '2 - 1', points: 3, reason: 'Placar idêntico.' },
+  { result: '2 - 1', prediction: '3 - 0', points: 1, reason: 'Acertou que o mandante venceu.' },
+  { result: '1 - 1', prediction: '0 - 0', points: 1, reason: 'Acertou o empate, errou o placar.' },
+  { result: '0 - 2', prediction: '1 - 0', points: 0, reason: 'Vencedor errado.' },
+]
+
+const TIPS = [
+  'Em jogos de mata-mata decididos na prorrogação ou nos pênaltis, conta apenas o placar dos 90 minutos.',
+  'Você pode editar o palpite quantas vezes quiser, até o apito inicial da partida.',
+  'A mesma pontuação vale no ranking geral e em todas as suas ligas.',
 ]
 
 function PointsBadge({ points }: { points: number }) {
-  if (points === 3) {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full border border-accent-border bg-accent-dim px-2.5 py-0.5 font-inter text-xs font-semibold text-accent">
-        <CheckCircle size={13} weight="fill" />
-        +3 pts
-      </span>
-    )
-  }
-  if (points === 1) {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full border border-warning-border bg-warning-dim px-2.5 py-0.5 font-inter text-xs font-semibold text-warning">
-        <Equals size={13} weight="bold" />
-        +1 pt
-      </span>
-    )
-  }
+  if (points === 3) return (
+    <span className="font-barlow text-[12px] font-bold text-accent bg-[rgba(0,255,135,.12)] rounded-[6px] px-[10px] py-[3px]">+3</span>
+  )
+  if (points === 1) return (
+    <span className="font-barlow text-[12px] font-bold text-warning bg-[rgba(245,158,11,.14)] rounded-[6px] px-[10px] py-[3px]">+1</span>
+  )
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-elevated px-2.5 py-0.5 font-inter text-xs font-semibold text-secondary">
-      <XCircle size={13} weight="fill" />
-      0 pts
-    </span>
+    <span className="font-barlow text-[12px] font-bold text-[rgba(255,255,255,.5)] bg-[rgba(255,255,255,.07)] rounded-[6px] px-[10px] py-[3px]">0</span>
   )
 }
 
 export default function PontuacaoPage() {
   return (
     <Container>
-      <SectionTitle className="mb-2">Como Pontuar</SectionTitle>
-      <p className="mb-8 font-inter text-sm text-secondary">
-        Entenda as regras do bolão e maximize seus pontos.
+      <div className="font-[Barlow_Condensed] text-[12px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
+        Como funciona
+      </div>
+      <h1 className="font-barlow text-[38px] font-extrabold text-primary mt-[6px]">
+        Regras de pontuação
+      </h1>
+      <p className="font-inter text-[14px] leading-[1.6] text-[rgba(255,255,255,.55)] max-w-[540px] mt-[8px]">
+        Você ganha pontos por jogo de acordo com a precisão do seu palpite. Vale sempre o placar do tempo normal — prorrogação e pênaltis não contam.
       </p>
 
-      {/* Regras */}
-      <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-5">
-          <div className="flex items-center gap-2">
-            <CheckCircle size={22} weight="fill" className="text-accent" />
-            <span className="font-barlow text-2xl font-black text-accent">3 pts</span>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-[14px] mt-[26px]">
+        <div className="bg-surface border border-border rounded-[14px] p-[24px]">
+          <div className="font-barlow text-[52px] font-black leading-none text-accent">3</div>
+          <div className="font-inter text-[16px] font-bold text-primary mt-[10px]">Placar exato</div>
+          <div className="font-inter text-[13px] leading-[1.55] text-[rgba(255,255,255,.55)] mt-[5px]">
+            Você acertou o número de gols dos dois times.
           </div>
-          <p className="font-inter text-sm font-semibold text-primary">Placar exato</p>
-          <p className="font-inter text-xs text-secondary">
-            Acertou o placar certinho: casa e visitante.
-          </p>
         </div>
-
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-5">
-          <div className="flex items-center gap-2">
-            <Equals size={22} weight="bold" className="text-warning" />
-            <span className="font-barlow text-2xl font-black text-warning">1 pt</span>
+        <div className="bg-surface border border-border rounded-[14px] p-[24px]">
+          <div className="font-barlow text-[52px] font-black leading-none text-warning">1</div>
+          <div className="font-inter text-[16px] font-bold text-primary mt-[10px]">Vencedor ou empate</div>
+          <div className="font-inter text-[13px] leading-[1.55] text-[rgba(255,255,255,.55)] mt-[5px]">
+            Você acertou quem venceu (ou o empate), mas não o placar.
           </div>
-          <p className="font-inter text-sm font-semibold text-primary">Vencedor ou empate</p>
-          <p className="font-inter text-xs text-secondary">
-            Acertou quem ganhou ou que seria empate, mas errou o placar.
-          </p>
         </div>
-
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-5">
-          <div className="flex items-center gap-2">
-            <XCircle size={22} weight="fill" className="text-secondary" />
-            <span className="font-barlow text-2xl font-black text-secondary">0 pts</span>
+        <div className="bg-surface border border-border rounded-[14px] p-[24px]">
+          <div className="font-barlow text-[52px] font-black leading-none text-[rgba(255,255,255,.35)]">0</div>
+          <div className="font-inter text-[16px] font-bold text-primary mt-[10px]">Errou</div>
+          <div className="font-inter text-[13px] leading-[1.55] text-[rgba(255,255,255,.55)] mt-[5px]">
+            O resultado foi diferente do que você palpitou.
           </div>
-          <p className="font-inter text-sm font-semibold text-primary">Errou</p>
-          <p className="font-inter text-xs text-secondary">
-            Chutou o vencedor errado ou errou o empate.
-          </p>
         </div>
       </div>
 
-      {/* Observação prorrogação */}
-      <div className="mb-8 rounded-xl border border-border bg-elevated px-4 py-3">
-        <p className="font-inter text-sm text-secondary">
-          <span className="font-semibold text-primary">Prorrogação e pênaltis:</span>{' '}
-          a pontuação usa sempre o placar do tempo normal (90 min). Se o jogo foi para a prorrogação, o que conta é o 0 × 0 ou 1 × 1 do tempo regulamentar.
-        </p>
-      </div>
-
-      {/* Tabela de exemplos */}
-      <h3 className="mb-3 font-barlow text-sm font-bold uppercase tracking-widest text-secondary">
+      <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.2em] text-[rgba(255,255,255,.42)] uppercase mt-[30px] mb-[12px]">
         Exemplos
-      </h3>
-      <div className="overflow-x-auto rounded-xl border border-border">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-border bg-elevated">
-              <th className="px-4 py-3 text-left font-inter text-[11px] uppercase tracking-widest text-secondary">
-                Resultado
-              </th>
-              <th className="px-4 py-3 text-left font-inter text-[11px] uppercase tracking-widest text-secondary">
-                Seu palpite
-              </th>
-              <th className="px-4 py-3 text-left font-inter text-[11px] uppercase tracking-widest text-secondary">
-                Pontos
-              </th>
-              <th className="hidden px-4 py-3 text-left font-inter text-[11px] uppercase tracking-widest text-secondary sm:table-cell">
-                Por quê
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {examples.map((ex, i) => (
-              <tr key={i} className="border-b border-border last:border-b-0">
-                <td className="px-4 py-3">
-                  <span className="font-barlow font-bold text-primary">{ex.result}</span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="font-barlow font-bold text-primary">{ex.prediction}</span>
-                </td>
-                <td className="px-4 py-3">
-                  <PointsBadge points={ex.points} />
-                </td>
-                <td className="hidden px-4 py-3 sm:table-cell">
-                  <span className="font-inter text-sm text-secondary">{ex.reason}</span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      </div>
+      <div className="bg-surface border border-border rounded-[14px] overflow-hidden">
+        <div className="grid [grid-template-columns:1fr_1fr_60px] sm:[grid-template-columns:120px_120px_70px_1fr] gap-[10px] sm:gap-[12px] px-[16px] sm:px-[20px] py-[13px] font-[Barlow_Condensed] text-[10px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase border-b border-border">
+          <span>Resultado</span>
+          <span>Palpite</span>
+          <span className="text-center">Pts</span>
+          <span className="hidden sm:block">Por quê</span>
+        </div>
+        {EXAMPLES.map((ex, i) => (
+          <div key={i} className="grid [grid-template-columns:1fr_1fr_60px] sm:[grid-template-columns:120px_120px_70px_1fr] gap-[10px] sm:gap-[12px] px-[16px] sm:px-[20px] py-[14px] items-center border-b border-[rgba(255,255,255,.05)] last:border-b-0">
+            <span className="font-barlow text-[14px] sm:text-[15px] font-semibold text-primary">{ex.result}</span>
+            <span className="font-barlow text-[14px] sm:text-[15px] font-semibold text-[rgba(255,255,255,.7)]">{ex.prediction}</span>
+            <span className="flex justify-center"><PointsBadge points={ex.points} /></span>
+            <span className="hidden sm:block font-inter text-[13px] text-[rgba(255,255,255,.55)]">{ex.reason}</span>
+          </div>
+        ))}
       </div>
 
-      {/* Dicas */}
-      <div className="mt-8 space-y-2">
-        <h3 className="font-barlow text-sm font-bold uppercase tracking-widest text-secondary">
-          Dicas
-        </h3>
-        <ul className="space-y-2">
-          {[
-            'Palpites ficam travados assim que o jogo começa — envie antes do apito inicial.',
-            'Você pode alterar seu palpite quantas vezes quiser até o jogo começar.',
-            'Nos mata-matas, o placar do tempo normal é o que vale, não o resultado final com prorrogação.',
-          ].map((tip, i) => (
-            <li key={i} className="flex items-start gap-2">
-              <span className="mt-0.5 font-barlow text-sm font-bold text-accent">→</span>
-              <span className="font-inter text-sm text-secondary">{tip}</span>
-            </li>
-          ))}
-        </ul>
+      <div className="flex flex-col gap-[10px] mt-[24px]">
+        {TIPS.map((tip, i) => (
+          <div key={i} className="flex gap-[11px] items-start">
+            <span className="text-accent font-inter text-[13px] font-bold leading-[1.5]">→</span>
+            <span className="font-inter text-[13.5px] leading-[1.5] text-[rgba(255,255,255,.7)]">{tip}</span>
+          </div>
+        ))}
       </div>
     </Container>
   )

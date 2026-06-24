@@ -15,6 +15,7 @@ export default auth((req) => {
     path === '/' ||
     path === '/jogos' ||
     path === '/pontuacao' ||
+    path.startsWith('/grupos/entrar') || // landing de convite: visível deslogado
     path.startsWith('/api/auth') ||
     path.startsWith('/api/cron') ||
     path.startsWith('/api/games')
@@ -26,9 +27,12 @@ export default auth((req) => {
     return NextResponse.redirect(new URL('/?login=1', req.url))
   }
 
-  // Regra 2: autenticado sem nickname → forçar onboarding
+  // Regra 2: autenticado sem nickname → forçar onboarding, preservando o
+  // destino original (ex.: link de convite) via callbackUrl interno.
   if (isAuthenticated && !hasNickname && path !== '/onboarding' && !isApiPath) {
-    return NextResponse.redirect(new URL('/onboarding', req.url))
+    const onboardingUrl = new URL('/onboarding', req.url)
+    onboardingUrl.searchParams.set('callbackUrl', path + req.nextUrl.search)
+    return NextResponse.redirect(onboardingUrl)
   }
 
   // Regra 3: autenticado com nickname tentando acessar /onboarding

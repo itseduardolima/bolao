@@ -4,13 +4,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
-const links = [
-  { href: '/jogos', label: 'Jogos' },
-  { href: '/pontuacao', label: 'Pontuação' },
-]
-
-export default function NavLinks() {
+export default function NavLinks({ authenticated = false }: { authenticated?: boolean }) {
   const pathname = usePathname()
+
+  const links = [
+    { href: '/jogos', label: 'Jogos' },
+    ...(authenticated ? [{ href: '/grupos', label: 'Grupos' }] : []),
+    { href: '/pontuacao', label: 'Pontuação' },
+  ]
 
   return (
     <>

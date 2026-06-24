@@ -24,7 +24,7 @@ export default async function Header() {
         </Link>
 
         <nav className="flex items-center gap-4 sm:gap-6">
-          <NavLinks />
+          <NavLinks authenticated={!!user} />
 
           {user ? (
             <>

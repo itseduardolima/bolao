@@ -5,6 +5,18 @@ import { useSession } from 'next-auth/react'
 
 type CheckStatus = 'idle' | 'checking' | 'available' | 'unavailable' | 'invalid'
 
+/**
+ * Aceita apenas caminhos internos relativos (mesma origem). Bloqueia
+ * open-redirect: rejeita URLs absolutas (`//host`, `/\host`, `https://...`).
+ */
+function safeCallbackUrl(raw: string | null): string {
+  const fallback = '/jogos'
+  if (!raw) return fallback
+  if (!raw.startsWith('/')) return fallback
+  if (raw.startsWith('//') || raw.startsWith('/\\')) return fallback
+  return raw
+}
+
 export function useOnboarding() {
   const { update } = useSession()
 
@@ -66,7 +78,10 @@ export function useOnboarding() {
       }
 
       await update({ hasNickname: true, nickname: value })
-      window.location.href = '/jogos'
+      const callbackUrl = safeCallbackUrl(
+        new URLSearchParams(window.location.search).get('callbackUrl')
+      )
+      window.location.href = callbackUrl
     } catch {
       setError('Erro de conexão. Tente novamente.')
     } finally {

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'ghost'
+  variant?: 'primary' | 'ghost' | 'danger'
   size?: 'sm' | 'md'
 }
 
@@ -22,6 +22,7 @@ export default function Button({
         variant === 'primary' && 'bg-accent text-black hover:opacity-85',
         variant === 'ghost' &&
           'border border-border text-secondary hover:text-primary',
+        variant === 'danger' && 'bg-error text-white hover:opacity-90',
         size === 'md' && 'px-6 py-2.5 text-base',
         size === 'sm' && 'px-4 py-1.5 text-sm',
         disabled && 'cursor-not-allowed opacity-30',

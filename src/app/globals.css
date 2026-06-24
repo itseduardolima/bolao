@@ -44,10 +44,22 @@
 
   /* Keyframes */
   --animate-pulse-live: pulse-live 1.5s ease-in-out infinite;
+  --animate-overlay-show: overlay-show 0.15s ease-out;
+  --animate-panel-show: panel-show 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 
   @keyframes pulse-live {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.4; }
+  }
+
+  @keyframes overlay-show {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes panel-show {
+    from { opacity: 0; transform: translateY(8px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
 }
 

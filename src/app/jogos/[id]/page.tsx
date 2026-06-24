@@ -1,19 +1,20 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { LockSimple, SignIn } from '@phosphor-icons/react/dist/ssr'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { cn, formatGameTime, formatGameDate } from '@/lib/utils'
+import { formatGameTime } from '@/lib/utils'
 import Container from '@/components/layout/Container'
-import BackButton from '@/components/ui/BackButton'
 import { StatusBadge } from '@/components/ui/Badge'
-import LiveScore from '@/components/game/LiveScore'
 import PredictionForm from '@/components/prediction/PredictionForm'
 import ParticipantPredictions from '@/components/prediction/ParticipantPredictions'
 import type { GameStatus } from '@/types'
 
 export const revalidate = 30
+
+function toCode(name: string) {
+  return name.slice(0, 3).toUpperCase()
+}
 
 export default async function GameDetailPage({
   params,
@@ -66,184 +67,128 @@ export default async function GameDetailPage({
     status === 'SCHEDULED' &&
     new Date(game.startsAt) > new Date()
 
+  let scoreCenter: string
+  let scoreColor: string
+  if (status === 'LIVE' || status === 'PAUSED') {
+    scoreCenter = `${game.homeScore ?? 0} - ${game.awayScore ?? 0}`
+    scoreColor = '#00ff87'
+  } else if (status === 'FINISHED') {
+    scoreCenter = `${game.homeScore ?? 0} - ${game.awayScore ?? 0}`
+    scoreColor = '#fff'
+  } else {
+    scoreCenter = formatGameTime(game.startsAt)
+    scoreColor = 'rgba(255,255,255,.3)'
+  }
+
   return (
     <main>
       <Container className="max-w-2xl">
-        <BackButton />
+        <Link
+          href="/jogos"
+          className="inline-flex items-center gap-[7px] font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)] hover:text-secondary transition-colors"
+        >
+          <span className="inline-block w-[7px] h-[7px] border-l-2 border-b-2 border-current rotate-45" />
+          Jogos
+        </Link>
 
-        {/* Game header */}
-        <div className="mb-8 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <StatusBadge status={status} />
-            <span className="font-inter text-sm text-secondary">{game.phase}</span>
-          </div>
-
-          <div className="flex items-center justify-between gap-6">
-            {/* Home team */}
-            <div className="flex flex-1 flex-col items-center gap-3">
-              {game.homeFlag ? (
-                <Image
-                  src={game.homeFlag}
-                  alt={game.homeTeam}
-                  width={64}
-                  height={64}
-                  className="rounded object-contain"
-                />
-              ) : (
-                <div className="h-16 w-16 rounded bg-elevated" />
-              )}
-              <span className="text-center font-barlow text-xl font-bold uppercase text-primary">
-                {game.homeTeam}
-              </span>
+        <div className="max-w-[660px] mx-auto mt-[18px]">
+          <div className="bg-surface border border-border rounded-[16px] p-[26px_28px]">
+            <div className="flex justify-center">
+              <StatusBadge status={status} />
             </div>
 
-            {/* Score / time */}
-            <div className="flex flex-col items-center gap-2">
-              {showScore ? (
-                status === 'LIVE' || status === 'PAUSED' ? (
-                  <LiveScore
-                    gameId={id}
-                    initialStatus={status}
-                    initialHomeScore={game.homeScore}
-                    initialAwayScore={game.awayScore}
+            <div className="grid [grid-template-columns:1fr_auto_1fr] items-center gap-[18px] mt-[20px]">
+              <div className="flex flex-col items-center gap-[9px]">
+                {game.homeFlag ? (
+                  <Image
+                    src={game.homeFlag}
+                    alt={game.homeTeam}
+                    width={52}
+                    height={36}
+                    className="rounded-[5px] shadow-[0_2px_8px_rgba(0,0,0,.3)] object-cover"
                   />
                 ) : (
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="font-barlow text-[40px] font-black leading-none text-accent">
-                      {game.homeScore} × {game.awayScore}
-                    </span>
-                    {game.duration === 'PENALTY_SHOOTOUT' &&
-                      game.penaltiesHome !== null &&
-                      game.penaltiesAway !== null && (
-                        <span className="rounded-full border border-border bg-elevated px-2.5 py-0.5 font-inter text-xs text-secondary">
-                          Pênaltis: {game.penaltiesHome} × {game.penaltiesAway}
-                        </span>
-                      )}
-                    {game.duration === 'EXTRA_TIME' && (
-                      <span className="rounded-full border border-border bg-elevated px-2.5 py-0.5 font-inter text-xs text-secondary">
-                        Prorrogação
-                      </span>
-                    )}
-                  </div>
-                )
-              ) : (
-                <div className="flex flex-col items-center gap-1">
-                  <span className="font-barlow text-2xl font-bold text-secondary">
-                    {formatGameTime(game.startsAt)}
-                  </span>
-                  <span className="font-inter text-xs text-secondary">
-                    {formatGameDate(game.startsAt)}
-                  </span>
+                  <div className="w-[52px] h-[36px] rounded-[5px] bg-elevated" />
+                )}
+                <div className="font-barlow text-[26px] font-extrabold text-primary leading-none">
+                  {toCode(game.homeTeam)}
                 </div>
-              )}
+                <div className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.55)]">
+                  {game.homeTeam}
+                </div>
+              </div>
+
+              <div
+                className="font-barlow text-[44px] font-extrabold leading-none whitespace-nowrap"
+                style={{ color: scoreColor }}
+              >
+                {scoreCenter}
+              </div>
+
+              <div className="flex flex-col items-center gap-[9px]">
+                {game.awayFlag ? (
+                  <Image
+                    src={game.awayFlag}
+                    alt={game.awayTeam}
+                    width={52}
+                    height={36}
+                    className="rounded-[5px] shadow-[0_2px_8px_rgba(0,0,0,.3)] object-cover"
+                  />
+                ) : (
+                  <div className="w-[52px] h-[36px] rounded-[5px] bg-elevated" />
+                )}
+                <div className="font-barlow text-[26px] font-extrabold text-primary leading-none">
+                  {toCode(game.awayTeam)}
+                </div>
+                <div className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.55)]">
+                  {game.awayTeam}
+                </div>
+              </div>
             </div>
 
-            {/* Away team */}
-            <div className="flex flex-1 flex-col items-center gap-3">
-              {game.awayFlag ? (
-                <Image
-                  src={game.awayFlag}
-                  alt={game.awayTeam}
-                  width={64}
-                  height={64}
-                  className="rounded object-contain"
-                />
-              ) : (
-                <div className="h-16 w-16 rounded bg-elevated" />
-              )}
-              <span className="text-center font-barlow text-xl font-bold uppercase text-primary">
-                {game.awayTeam}
-              </span>
+            <div className="text-center font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)] mt-[18px]">
+              {game.phase}{game.city ? ` · ${game.city}` : ''}
             </div>
           </div>
 
-          {(game.venue || game.city) && (
-            <p className="text-center font-inter text-xs text-secondary">
-              {[game.venue, game.city].filter(Boolean).join(' · ')}
-            </p>
-          )}
-        </div>
-
-        {/* Prediction section */}
-        <div className="mb-8 rounded-xl border border-border bg-surface p-6">
-          <h2 className="mb-4 font-barlow text-[13px] font-bold uppercase tracking-[2px] text-secondary">
-            Meu palpite
-          </h2>
-
-          {!userId && (
-            <Link
-              href="/?login=1"
-              className="flex items-center gap-2 font-inter text-sm text-secondary transition-colors hover:text-primary"
-            >
-              <SignIn size={16} weight="bold" className="text-accent" />
-              Entre para enviar seu palpite
-            </Link>
-          )}
-
-          {userId && (status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED') && (
-            <div className="space-y-3">
-              <p className="flex items-center gap-1.5 font-inter text-sm text-secondary">
-                <LockSimple size={14} weight="bold" />
-                Palpites encerrados
-              </p>
-              {prediction ? (
-                <div className="flex items-center justify-between rounded-lg bg-elevated px-4 py-3">
-                  <span className="font-inter text-xs text-secondary">Seu palpite</span>
-                  <span className="font-barlow text-lg font-bold text-primary">
-                    {prediction.homeScore} × {prediction.awayScore}
-                  </span>
-                  {status === 'FINISHED' && prediction.points !== null && (
-                    <span
-                      className={cn(
-                        'rounded-full px-2.5 py-0.5 font-inter text-xs font-semibold',
-                        prediction.points === 3 &&
-                          'border border-accent-border bg-accent-dim text-accent',
-                        prediction.points === 1 &&
-                          'border border-warning-border bg-warning-dim text-warning',
-                        prediction.points === 0 && 'bg-elevated text-secondary'
-                      )}
-                    >
-                      {prediction.points === 3
-                        ? '+3 pts'
-                        : prediction.points === 1
-                          ? '+1 pt'
-                          : '0 pts'}
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <p className="font-inter text-xs text-secondary">Você não enviou palpite.</p>
-              )}
+          {canPredict && (
+            <div className="bg-surface border border-border rounded-[16px] p-[24px_28px] mt-[14px]">
+              <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.2em] text-[rgba(255,255,255,.42)] uppercase">
+                Seu palpite
+              </div>
+              <PredictionForm
+                gameId={game.id}
+                homeTeam={game.homeTeam}
+                awayTeam={game.awayTeam}
+                startsAt={game.startsAt.toISOString()}
+                initialHomeScore={prediction?.homeScore}
+                initialAwayScore={prediction?.awayScore}
+              />
             </div>
           )}
 
-          {canPredict && (
-            <PredictionForm
-              gameId={id}
-              homeTeam={game.homeTeam}
-              awayTeam={game.awayTeam}
-              startsAt={game.startsAt.toISOString()}
-              initialHomeScore={prediction?.homeScore ?? null}
-              initialAwayScore={prediction?.awayScore ?? null}
+          {!userId && status === 'SCHEDULED' && (
+            <div className="bg-surface border border-border rounded-[16px] p-[28px] mt-[14px] text-center">
+              <div className="font-inter text-[14px] font-semibold text-primary">
+                Entre para registrar seu palpite
+              </div>
+              <Link
+                href="/?login=1"
+                className="inline-flex items-center justify-center h-[48px] px-[26px] mt-[16px] bg-accent text-black rounded-[12px] font-inter text-[14px] font-bold"
+              >
+                Entrar para palpitar
+              </Link>
+            </div>
+          )}
+
+          {showScore && (
+            <ParticipantPredictions
+              gameId={game.id}
+              showStats={status === 'FINISHED'}
+              currentUserId={userId ?? undefined}
             />
           )}
-
-          {userId && status === 'SCHEDULED' && !canPredict && (
-            <p className="flex items-center gap-1.5 font-inter text-sm text-secondary">
-              <LockSimple size={14} weight="bold" />
-              Palpites encerrados
-            </p>
-          )}
         </div>
-
-        {/* Participant predictions (LIVE or FINISHED) */}
-        {(status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED') && (
-          <ParticipantPredictions
-            gameId={id}
-            currentUserId={userId}
-            showStats={status === 'FINISHED'}
-          />
-        )}
       </Container>
     </main>
   )

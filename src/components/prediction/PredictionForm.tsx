@@ -2,9 +2,6 @@
 
 import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Timer, CheckCircle, XCircle } from '@phosphor-icons/react'
-import { InputScore } from '@/components/ui/Input'
-import Button from '@/components/ui/Button'
 import { formatCountdown } from '@/lib/utils'
 import { savePrediction } from '@/actions/predictions'
 
@@ -85,60 +82,59 @@ export default function PredictionForm({
   return (
     <div>
       {isCountdown && (
-        <p className="mb-4 flex items-center gap-1.5 font-inter text-sm text-warning">
-          <Timer size={15} weight="bold" />
-          Palpites encerram em {formatCountdown(Math.max(0, msLeft))}
+        <p className="font-inter text-[12px] text-warning mt-[6px] mb-[12px]">
+          Encerra em {formatCountdown(Math.max(0, msLeft))}
         </p>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="flex items-end justify-center gap-6">
-          <div className="flex flex-col items-center gap-2">
-            <span className="font-barlow text-sm font-bold uppercase tracking-wide text-secondary">
-              {homeTeam}
-            </span>
-            <InputScore
-              value={homeScore}
-              onChange={(e) => setHomeScore(e.target.value)}
-              disabled={isPending}
-              aria-label={`Gols ${homeTeam}`}
-            />
-          </div>
-
-          <span className="mb-4 font-barlow text-2xl font-bold text-secondary">×</span>
-
-          <div className="flex flex-col items-center gap-2">
-            <span className="font-barlow text-sm font-bold uppercase tracking-wide text-secondary">
-              {awayTeam}
-            </span>
-            <InputScore
-              value={awayScore}
-              onChange={(e) => setAwayScore(e.target.value)}
-              disabled={isPending}
-              aria-label={`Gols ${awayTeam}`}
-            />
-          </div>
+      <form onSubmit={handleSubmit}>
+        <div className="flex items-center justify-center gap-[20px] mt-[16px]">
+          <input
+            value={homeScore}
+            onChange={e => setHomeScore(e.target.value)}
+            inputMode="numeric"
+            placeholder="0"
+            disabled={isPending}
+            className="w-[72px] h-[72px] text-center bg-base-dark border border-[rgba(255,255,255,.14)] rounded-[14px] text-primary font-barlow text-[34px] font-extrabold outline-none focus:border-accent transition-colors"
+          />
+          <span className="font-barlow text-[24px] font-bold text-[rgba(255,255,255,.3)]">×</span>
+          <input
+            value={awayScore}
+            onChange={e => setAwayScore(e.target.value)}
+            inputMode="numeric"
+            placeholder="0"
+            disabled={isPending}
+            className="w-[72px] h-[72px] text-center bg-base-dark border border-[rgba(255,255,255,.14)] rounded-[14px] text-primary font-barlow text-[34px] font-extrabold outline-none focus:border-accent transition-colors"
+          />
         </div>
 
-        <Button type="submit" variant="primary" disabled={isPending} className="w-full">
-          {isPending ? 'Salvando...' : 'Salvar palpite'}
-        </Button>
-      </form>
+        {feedback?.type === 'error' && (
+          <div className="text-center font-inter text-[12px] text-error mt-[12px]">
+            {feedback.message}
+          </div>
+        )}
 
-      {feedback && (
-        <p
-          className={`mt-3 flex items-center gap-1.5 font-inter text-sm ${
-            feedback.type === 'success' ? 'text-accent' : 'text-error'
-          }`}
+        <button
+          type="submit"
+          disabled={isPending}
+          className="w-full h-[48px] mt-[18px] bg-accent text-black rounded-[12px] font-inter text-[14px] font-bold flex items-center justify-center gap-[8px] disabled:opacity-70 transition-opacity"
         >
-          {feedback.type === 'success' ? (
-            <CheckCircle size={15} weight="fill" />
-          ) : (
-            <XCircle size={15} weight="fill" />
+          {isPending && (
+            <span className="w-[15px] h-[15px] border-2 border-[rgba(0,0,0,.3)] border-t-black rounded-full inline-block animate-spin" />
           )}
-          {feedback.message}
-        </p>
-      )}
+          {isPending ? 'Salvando...' : (initialHomeScore != null ? 'Atualizar palpite' : 'Salvar palpite')}
+        </button>
+
+        {feedback?.type === 'success' && (
+          <p className="text-center font-inter text-[12px] text-accent mt-[10px]">
+            {feedback.message}
+          </p>
+        )}
+
+        <div className="text-center font-inter text-[11px] text-[rgba(255,255,255,.35)] mt-[12px]">
+          Vale o placar do tempo normal. Você pode editar até o apito inicial.
+        </div>
+      </form>
     </div>
   )
 }

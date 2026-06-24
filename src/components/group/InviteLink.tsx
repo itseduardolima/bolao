@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Copy, Check, ArrowsClockwise } from '@phosphor-icons/react'
 import { regenerateInviteCode } from '@/actions/groups'
 import { buildInvitePath } from '@/lib/group-constants'
 import { useConfirm } from '@/components/ui/ConfirmDialog'
@@ -57,51 +56,60 @@ export default function InviteLink({ groupId, code: initialCode, isOwner }: Invi
 
   return (
     <div>
-      <div className="mb-2 flex items-baseline justify-between">
-        <span className="font-inter text-[11px] uppercase tracking-widest text-secondary">
-          Convite
-        </span>
-        {isOwner && (
+      <div className="bg-surface border border-border rounded-xl p-5 flex items-center justify-between gap-6 flex-wrap">
+        {/* Left side: code block */}
+        <div>
+          <div className="font-barlow text-[11px] font-semibold uppercase tracking-[.2em] text-[rgba(255,255,255,.42)]">
+            Código de convite
+          </div>
+          <div className="font-barlow text-[34px] font-black leading-none tracking-[.16em] text-accent mt-2">
+            {code}
+          </div>
+          <div className="font-mono text-[12px] text-[rgba(255,255,255,.27)] mt-2">
+            {path}
+          </div>
+        </div>
+
+        {/* Right side: action buttons */}
+        <div className="flex sm:flex-row flex-col gap-2 w-full sm:w-auto">
+          {/* Copy link button */}
           <button
             type="button"
-            onClick={handleRegenerate}
-            disabled={isPending}
-            className="inline-flex items-center gap-1 font-inter text-[11px] text-secondary transition-colors hover:text-primary disabled:opacity-50"
+            onClick={handleCopy}
+            className="h-[40px] px-4 bg-elevated border border-border text-primary rounded-[10px] font-inter text-[13px] font-semibold transition-colors hover:text-primary hover:border-white/20"
+            aria-label="Copiar link de convite"
           >
-            <ArrowsClockwise size={12} weight="bold" className={isPending ? 'animate-spin' : ''} />
-            {isPending ? 'Gerando' : 'Novo código'}
+            {copied ? (
+              <span className="text-accent">✓ Copiado</span>
+            ) : (
+              'Copiar link'
+            )}
           </button>
-        )}
-      </div>
 
-      <div className="flex items-stretch overflow-hidden rounded-xl border border-border bg-elevated">
-        <div className="flex min-w-0 flex-1 flex-col justify-center px-4 py-3">
-          <span className="font-barlow text-2xl font-black tracking-[0.3em] text-accent">
-            {code}
-          </span>
-          <span className="mt-0.5 truncate font-inter text-xs text-muted">{path}</span>
-        </div>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="flex shrink-0 items-center gap-1.5 border-l border-border px-4 font-inter text-sm font-semibold text-secondary transition-colors hover:bg-surface hover:text-primary"
-          aria-label="Copiar link de convite"
-        >
-          {copied ? (
-            <>
-              <Check size={16} weight="bold" className="text-accent" />
-              <span className="text-accent">Copiado</span>
-            </>
-          ) : (
-            <>
-              <Copy size={16} weight="bold" />
-              Copiar
-            </>
+          {/* Regenerate code button — owner only */}
+          {isOwner && (
+            <button
+              type="button"
+              onClick={handleRegenerate}
+              disabled={isPending}
+              className="h-[40px] px-4 bg-transparent border border-error/40 text-error rounded-[10px] font-inter text-[13px] font-semibold transition-colors hover:bg-error/10 disabled:opacity-50"
+            >
+              {isPending ? (
+                <>
+                  <span className="inline-block w-3 h-3 rounded-full border-2 border-white/20 border-t-error animate-spin" />
+                  {' '}Gerando…
+                </>
+              ) : (
+                'Novo código'
+              )}
+            </button>
           )}
-        </button>
+        </div>
       </div>
 
-      {error && <p className="mt-2 font-inter text-sm text-error">{error}</p>}
+      {error && (
+        <p className="mt-3 font-inter text-[12px] text-error">{error}</p>
+      )}
     </div>
   )
 }

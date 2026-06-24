@@ -3,8 +3,6 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { getGroupRanking } from '@/lib/ranking'
-import Container from '@/components/layout/Container'
-import SectionTitle from '@/components/layout/SectionTitle'
 import CreateGroupForm from '@/components/group/CreateGroupForm'
 import JoinGroupForm from '@/components/group/JoinGroupForm'
 import MemberStack from '@/components/group/MemberStack'
@@ -42,69 +40,90 @@ export default async function GruposPage() {
   })
 
   return (
-    <Container>
-      <SectionTitle className="mb-2">Grupos</SectionTitle>
-      <p className="mb-6 max-w-xl font-inter text-sm text-secondary">
-        Ligas privadas para disputar com seus amigos. Seu palpite no bolão vale em
-        todas elas — aqui muda só com quem você compete.
+    <div className="mx-auto max-w-5xl px-8 py-9">
+      {/* Header */}
+      <div className="font-barlow text-[12px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
+        Suas ligas
+      </div>
+      <h1 className="font-barlow text-[38px] font-black uppercase text-primary leading-none mt-[6px]">
+        Ligas
+      </h1>
+      <p className="font-inter text-[14px] leading-relaxed text-[rgba(255,255,255,.67)] max-w-[560px] mt-[10px]">
+        Rankings privados entre amigos, só por convite. Seu palpite no bolão geral vale automaticamente em todas as ligas — elas são lentes do mesmo jogo, não palpites separados.
       </p>
 
-      <CreateGroupForm />
-      <div className="mb-10 mt-4">
+      {/* Forms grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-[14px] mt-[26px]">
+        <CreateGroupForm />
         <JoinGroupForm />
       </div>
 
-      <h3 className="mb-3 flex items-baseline gap-2 border-b border-border pb-2 font-barlow text-sm font-bold uppercase tracking-widest text-secondary">
-        Suas ligas
-        {cards.length > 0 && <span className="text-muted">{cards.length}</span>}
+      {/* Cards section title */}
+      <h3 className="mt-[26px] mb-[14px] font-barlow text-[11px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
+        {cards.length > 0 && `${cards.length} ${cards.length === 1 ? 'liga' : 'ligas'}`}
       </h3>
 
       {cards.length === 0 ? (
-        <p className="max-w-md font-inter text-sm text-secondary">
-          Você ainda não está em nenhuma liga. Crie a sua acima ou cole um código de
-          convite para entrar na de um amigo.
-        </p>
+        <div className="mt-[40px] border border-dashed border-white/[.14] rounded-[14px] py-[48px] px-[40px] text-center">
+          <div className="font-barlow text-[26px] font-bold uppercase text-primary">
+            Você ainda não está em nenhuma liga
+          </div>
+          <p className="font-inter text-[14px] leading-relaxed text-[rgba(255,255,255,.67)] max-w-[440px] mx-auto mt-3">
+            Crie uma liga e convide a galera, ou entre numa existente com um código de convite. Seu palpite no bolão geral já conta automaticamente.
+          </p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[14px]">
           {cards.map((g) => (
             <Link
               key={g.id}
               href={`/grupos/${g.id}`}
-              className="block rounded-xl border border-border bg-surface p-5 transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_#00ff8715]"
+              className="block bg-surface border border-white/[.06] rounded-xl p-[18px] cursor-pointer transition-all duration-150 hover:bg-elevated hover:border-white/[.14] hover:-translate-y-0.5"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <h4 className="truncate font-barlow text-xl font-bold uppercase text-primary">
-                    {g.name}
-                  </h4>
-                  <p className="mt-0.5 font-inter text-xs text-secondary">
-                    {g.isOwner && <span className="font-semibold text-accent">Dono</span>}
-                    {g.isOwner && ' · '}
-                    {g.memberCount} {g.memberCount === 1 ? 'membro' : 'membros'}
-                  </p>
+              {/* top row: name + owner badge */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="font-barlow text-[20px] font-bold uppercase text-primary leading-[1.05]">
+                  {g.name}
                 </div>
-                <MemberStack members={g.top} total={g.memberCount} />
+                {g.isOwner && (
+                  <span className="flex-shrink-0 font-barlow text-[9px] font-semibold uppercase tracking-[.14em] text-accent bg-accent/[.13] rounded-[4px] px-[7px] py-[3px]">
+                    Dono
+                  </span>
+                )}
               </div>
 
-              <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-                <span className="font-inter text-xs text-secondary">
-                  Sua posição{' '}
-                  <span className="font-barlow text-base font-bold text-primary">
+              {/* avatars + member count */}
+              <div className="flex items-center gap-[10px] mt-[14px]">
+                <MemberStack members={g.top} total={g.memberCount} size={26} borderColor="#16162a" />
+                <span className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)]">
+                  {g.memberCount} {g.memberCount === 1 ? 'membro' : 'membros'}
+                </span>
+              </div>
+
+              {/* footer: position + points */}
+              <div className="flex items-end justify-between mt-[16px] pt-[14px] border-t border-white/[.06]">
+                <div>
+                  <div className="font-barlow text-[10px] font-medium uppercase tracking-[.16em] text-[rgba(255,255,255,.42)]">
+                    Sua posição
+                  </div>
+                  <div className="font-barlow text-[24px] font-black leading-none text-primary mt-[2px]">
                     {g.myRank ? `${g.myRank}º` : '—'}
-                  </span>{' '}
-                  de {g.memberCount}
-                </span>
-                <span className="font-inter text-xs text-secondary">
-                  <span className="font-barlow text-base font-bold text-accent">
+                    <span className="font-medium text-[14px] text-[rgba(255,255,255,.42)]"> de {g.memberCount}</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-barlow text-[10px] font-medium uppercase tracking-[.16em] text-[rgba(255,255,255,.42)]">
+                    Pontos
+                  </div>
+                  <div className="font-barlow text-[24px] font-black leading-none text-primary mt-[2px]">
                     {g.myPoints}
-                  </span>{' '}
-                  pts
-                </span>
+                  </div>
+                </div>
               </div>
             </Link>
           ))}
         </div>
       )}
-    </Container>
+    </div>
   )
 }

@@ -1,11 +1,9 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { CaretLeft } from '@phosphor-icons/react/dist/ssr'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { getGroupRanking } from '@/lib/ranking'
 import { GROUP_ROLE } from '@/lib/group-constants'
-import Container from '@/components/layout/Container'
 import Avatar from '@/components/ui/Avatar'
 import RankingTable from '@/components/ranking/RankingTable'
 import GroupTabs from '@/components/group/GroupTabs'
@@ -62,20 +60,17 @@ export default async function GroupDetailPage({
       {group.members.map(({ role, user }) => {
         const isGroupOwner = role === GROUP_ROLE.OWNER
         return (
-          <li
-            key={user.id}
-            className="flex items-center justify-between gap-3 border-b border-border py-3 last:border-b-0"
-          >
-            <div className="flex min-w-0 items-center gap-3">
+          <li key={user.id} className="flex items-center justify-between gap-3 py-3 px-[14px] rounded-[10px] last:border-b-0">
+            <div className="flex items-center gap-3 min-w-0">
               <Avatar src={user.image} name={user.nickname ?? 'U'} size={32} />
-              <span className="truncate font-inter text-sm text-primary">
+              <span className="font-inter text-[14px] font-semibold text-primary truncate">
                 {user.nickname ?? 'Sem apelido'}
-                {isGroupOwner && (
-                  <span className="ml-2 text-xs uppercase tracking-widest text-secondary">
-                    dono
-                  </span>
-                )}
               </span>
+              {isGroupOwner && (
+                <span className="font-barlow text-[9px] font-semibold uppercase tracking-[.14em] text-accent bg-accent/[.13] rounded-[4px] px-[7px] py-[3px]">
+                  Dono
+                </span>
+              )}
             </div>
             {isOwner && !isGroupOwner && (
               <RemoveMemberButton
@@ -91,36 +86,47 @@ export default async function GroupDetailPage({
   )
 
   return (
-    <Container>
+    <div className="mx-auto max-w-4xl px-8 py-6">
+      {/* Breadcrumb */}
       <Link
         href="/grupos"
-        className="mb-5 inline-flex items-center gap-1 font-inter text-sm text-secondary transition-colors hover:text-primary"
+        className="inline-flex items-center gap-[7px] font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)] hover:text-secondary transition-colors"
       >
-        <CaretLeft size={16} weight="bold" />
-        Grupos
+        <span className="inline-block w-[7px] h-[7px] border-l-2 border-b-2 border-current rotate-45" />
+        Ligas
+        <span className="text-[rgba(255,255,255,.27)]">/</span>
+        <span className="text-[rgba(255,255,255,.67)]">{group.name}</span>
       </Link>
 
-      {/* Cabeçalho */}
-      <h1 className="font-barlow text-section uppercase leading-none tracking-wide text-primary">
-        {group.name}
-      </h1>
-      <p className="mt-2 font-inter text-sm text-secondary">
-        {memberCount} {memberCount === 1 ? 'membro' : 'membros'}
-        {leader && (
-          <>
-            {' · '}líder <span className="text-primary">{leader}</span>
-          </>
-        )}
-        {isOwner && <span className="ml-2 align-middle text-xs uppercase tracking-widest text-accent">você é o dono</span>}
-      </p>
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4 mt-[18px]">
+        <div>
+          <div className="flex items-center gap-[10px] flex-wrap">
+            <h1 className="font-barlow text-[40px] font-black uppercase text-primary leading-none m-0">
+              {group.name}
+            </h1>
+            {isOwner && (
+              <span className="font-barlow text-[10px] font-semibold uppercase tracking-[.14em] text-accent bg-accent/[.13] rounded-[5px] px-[9px] py-[4px]">
+                Você é o dono
+              </span>
+            )}
+          </div>
+          <div className="font-inter text-[14px] text-[rgba(255,255,255,.67)] mt-2">
+            {memberCount} {memberCount === 1 ? 'membro' : 'membros'}
+            {leader && (
+              <> · liderado por <span className="text-primary font-semibold">{leader}</span></>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Convite */}
-      <div className="mt-8">
+      <div className="mt-[22px]">
         <InviteLink groupId={group.id} code={group.inviteCode} isOwner={isOwner} />
       </div>
 
       {/* Abas: ranking livre + gestão de membros separada */}
-      <div className="mt-10">
+      <div className="mt-[26px]">
         <GroupTabs
           tabs={[
             { id: 'ranking', label: 'Classificação', content: <RankingTable entries={ranking} /> },
@@ -130,9 +136,9 @@ export default async function GroupDetailPage({
       </div>
 
       {/* Zona de risco */}
-      <div className="mt-12 border-border pt-5">
+      <div className="mt-[30px] pt-5 border-t border-white/[.06] flex justify-end">
         <GroupActions groupId={group.id} isOwner={isOwner} />
       </div>
-    </Container>
+    </div>
   )
 }

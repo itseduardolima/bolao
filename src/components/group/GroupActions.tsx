@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { SignOut, Trash } from '@phosphor-icons/react'
 import { leaveGroup, deleteGroup } from '@/actions/groups'
 import { useConfirm } from '@/components/ui/ConfirmDialog'
 
@@ -56,15 +55,14 @@ export default function GroupActions({ groupId, isOwner }: GroupActionsProps) {
   }
 
   return (
-    <div className="flex flex-col items-start gap-2">
+    <div className="flex justify-end">
       {isOwner ? (
         <button
           type="button"
           onClick={handleDelete}
           disabled={isPending}
-          className="inline-flex items-center gap-1.5 font-inter text-sm text-error transition-opacity hover:opacity-80 disabled:opacity-50"
+          className="bg-transparent border border-error/40 text-error px-[18px] py-[10px] rounded-[10px] font-inter text-[13px] font-semibold cursor-pointer transition-colors hover:bg-error/10 disabled:opacity-50"
         >
-          <Trash size={16} weight="bold" />
           {isPending ? 'Excluindo...' : 'Excluir grupo'}
         </button>
       ) : (
@@ -72,9 +70,8 @@ export default function GroupActions({ groupId, isOwner }: GroupActionsProps) {
           type="button"
           onClick={handleLeave}
           disabled={isPending}
-          className="inline-flex items-center gap-1.5 font-inter text-sm text-secondary transition-colors hover:text-error disabled:opacity-50"
+          className="bg-transparent border border-error/40 text-error px-[18px] py-[10px] rounded-[10px] font-inter text-[13px] font-semibold cursor-pointer transition-colors hover:bg-error/10 disabled:opacity-50"
         >
-          <SignOut size={16} weight="bold" />
           {isPending ? 'Saindo...' : 'Sair do grupo'}
         </button>
       )}

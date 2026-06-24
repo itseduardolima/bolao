@@ -4,7 +4,6 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { joinGroup } from '@/actions/groups'
 import { INVITE_CODE_LENGTH, normalizeInviteCode } from '@/lib/group-constants'
-import Input from '@/components/ui/Input'
 
 export default function JoinGroupForm() {
   const router = useRouter()
@@ -29,28 +28,31 @@ export default function JoinGroupForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <span className="font-inter text-sm text-secondary">Tem um convite?</span>
-      <Input
-        value={code}
-        onChange={(e) => setCode(e.target.value.toUpperCase())}
-        placeholder="CÓDIGO"
-        maxLength={INVITE_CODE_LENGTH}
-        autoComplete="off"
-        autoCapitalize="characters"
-        spellCheck={false}
-        aria-label="Código de convite"
-        className="h-9 w-36 py-0 font-barlow text-base font-bold tracking-[0.25em] placeholder:tracking-normal placeholder:font-inter placeholder:text-muted"
-        disabled={isPending}
-      />
-      <button
-        type="submit"
-        disabled={!canSubmit}
-        className="font-inter text-sm font-semibold text-accent transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-30"
-      >
-        {isPending ? 'Entrando...' : 'Entrar'}
-      </button>
-      {error && <p className="w-full font-inter text-sm text-error">{error}</p>}
-    </form>
+    <div className="bg-surface border border-border rounded-xl p-[18px] pb-5">
+      <div className="font-barlow text-[11px] font-semibold uppercase tracking-[.2em] text-[rgba(255,255,255,.42)]">
+        Entrar com código
+      </div>
+      <form onSubmit={handleSubmit}>
+        <div className="flex gap-2 mt-3">
+          <input
+            value={code}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            maxLength={INVITE_CODE_LENGTH}
+            placeholder="A1B2C3D4"
+            className="flex-1 h-[42px] px-[14px] bg-base border border-white/10 rounded-[10px] text-primary font-mono text-[14px] tracking-[.18em] uppercase outline-none focus:border-white/25 transition-colors placeholder:text-muted placeholder:tracking-normal placeholder:normal-case"
+          />
+          <button
+            type="submit"
+            disabled={!canSubmit}
+            className="h-[42px] px-[22px] bg-elevated border border-white/14 text-primary rounded-[10px] font-inter text-[14px] font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:opacity-80"
+          >
+            {isPending ? 'Entrando...' : 'Entrar'}
+          </button>
+        </div>
+        {error && (
+          <div className="font-inter text-[12px] text-error mt-2">{error}</div>
+        )}
+      </form>
+    </div>
   )
 }

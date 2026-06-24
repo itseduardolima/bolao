@@ -4,8 +4,6 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createGroup } from '@/actions/groups'
 import { GROUP_NAME_MIN, GROUP_NAME_MAX } from '@/lib/group-constants'
-import Input from '@/components/ui/Input'
-import Button from '@/components/ui/Button'
 
 export default function CreateGroupForm() {
   const router = useRouter()
@@ -32,28 +30,32 @@ export default function CreateGroupForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Nome da nova liga"
-          maxLength={GROUP_NAME_MAX}
-          autoComplete="off"
-          disabled={isPending}
-          aria-label="Nome da nova liga"
-        />
-        <Button
-          type="submit"
-          variant="primary"
-          size="md"
-          disabled={!canSubmit}
-          className="shrink-0"
-        >
-          {isPending ? 'Criando...' : 'Criar liga'}
-        </Button>
+    <div className="bg-surface border border-border rounded-xl p-[18px] pb-5">
+      <div className="font-barlow text-[11px] font-semibold uppercase tracking-[.2em] text-[rgba(255,255,255,.42)]">
+        Criar nova liga
       </div>
-      {error && <p className="mt-2 font-inter text-sm text-error">{error}</p>}
-    </form>
+      <form onSubmit={handleSubmit}>
+        <div className="flex gap-2 mt-3">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onInput={(e) => setName((e.target as HTMLInputElement).value)}
+            placeholder="Nome da liga"
+            maxLength={GROUP_NAME_MAX}
+            className="flex-1 h-[42px] px-[14px] bg-base border border-white/10 rounded-[10px] text-primary font-inter text-[14px] font-medium outline-none focus:border-white/25 transition-colors placeholder:text-muted"
+          />
+          <button
+            type="submit"
+            disabled={!canSubmit}
+            className="h-[42px] px-[22px] bg-accent text-black border-none rounded-[10px] font-inter text-[14px] font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:opacity-85"
+          >
+            {isPending ? 'Criando...' : 'Criar'}
+          </button>
+        </div>
+        {error && (
+          <div className="font-inter text-[12px] text-error mt-2">{error}</div>
+        )}
+      </form>
+    </div>
   )
 }

@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { X } from '@phosphor-icons/react'
 import { removeMember } from '@/actions/groups'
 import { useConfirm } from '@/components/ui/ConfirmDialog'
 
@@ -19,7 +18,7 @@ export default function RemoveMemberButton({
 }: RemoveMemberButtonProps) {
   const router = useRouter()
   const confirm = useConfirm()
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   async function handleRemove() {
@@ -42,18 +41,20 @@ export default function RemoveMemberButton({
   }
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={handleRemove}
-        disabled={isPending}
-        className="inline-flex items-center justify-center rounded-md p-1 text-secondary transition-colors hover:bg-elevated hover:text-error disabled:opacity-50"
-        aria-label={`Remover ${targetName}`}
-        title={`Remover ${targetName}`}
-      >
-        <X size={16} weight="bold" />
-      </button>
-      {error && <span className="font-inter text-xs text-error">{error}</span>}
-    </>
+    <button
+      type="button"
+      onClick={handleRemove}
+      disabled={isPending}
+      className="bg-transparent border-none font-inter text-[12px] font-semibold text-error cursor-pointer px-2 py-1.5 rounded-md transition-colors hover:bg-error/10 disabled:opacity-50"
+    >
+      {isPending ? (
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block w-[13px] h-[13px] rounded-full border-2 border-white/20 border-t-error animate-spin" />
+          Removendo
+        </span>
+      ) : (
+        'Remover'
+      )}
+    </button>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { cn } from '@/lib/utils'
 
 type Tab = {
   id: string
@@ -14,7 +13,7 @@ export default function GroupTabs({ tabs }: { tabs: Tab[] }) {
 
   return (
     <div>
-      <div role="tablist" className="mb-5 flex items-center gap-6 border-b border-border">
+      <div role="tablist" className="flex gap-[26px] border-b border-border">
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -24,12 +23,13 @@ export default function GroupTabs({ tabs }: { tabs: Tab[] }) {
             aria-selected={active === t.id}
             aria-controls={`panel-${t.id}`}
             onClick={() => setActive(t.id)}
-            className={cn(
-              '-mb-px border-b-2 pb-2.5 font-barlow text-sm font-bold uppercase tracking-widest transition-colors',
-              active === t.id
-                ? 'border-accent text-primary'
-                : 'border-transparent text-secondary hover:text-primary'
-            )}
+            style={active === t.id ? { boxShadow: 'inset 0 -2px 0 #00ff87' } : undefined}
+            className={
+              'pb-[11px] font-inter text-[13px] font-semibold cursor-pointer bg-transparent border-none outline-none transition-colors ' +
+              (active === t.id
+                ? 'text-primary'
+                : 'text-[rgba(255,255,255,0.42)] hover:text-secondary')
+            }
           >
             {t.label}
           </button>

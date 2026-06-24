@@ -3,7 +3,6 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { joinGroup } from '@/actions/groups'
-import Button from '@/components/ui/Button'
 
 export default function JoinGroupButton({ code }: { code: string }) {
   const router = useRouter()
@@ -24,16 +23,13 @@ export default function JoinGroupButton({ code }: { code: string }) {
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <Button
-        type="button"
-        variant="primary"
-        size="md"
+      <button
         onClick={handleJoin}
         disabled={isPending}
-        className="w-full"
+        className="inline-flex items-center justify-center h-[48px] px-[36px] bg-accent text-black border-none rounded-xl font-inter text-[15px] font-bold cursor-pointer hover:opacity-85 transition-opacity disabled:opacity-50"
       >
-        {isPending ? 'Entrando...' : 'Entrar no grupo'}
-      </Button>
+        {isPending ? 'Entrando...' : 'Entrar na liga'}
+      </button>
       {error && <p className="font-inter text-sm text-error">{error}</p>}
     </div>
   )

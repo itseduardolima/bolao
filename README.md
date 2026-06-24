@@ -10,7 +10,7 @@ Site de bolão entre amigos para a Copa do Mundo de 2026. Sem apostas ou prêmio
 | Banco de dados | SQLite via Prisma 7 + Turso/libSQL (serverless) |
 | Autenticação | Auth.js v5 (`next-auth@beta`) — Google OAuth |
 | API de jogos | [football-data.org](https://www.football-data.org) (plano gratuito, competição `WC`) |
-| Fetching/Cache | TanStack Query (React Query v5) |
+| Pagamentos | [Asaas](https://www.asaas.com) — cobrança PIX para criação de ligas |
 | Estilo | Tailwind CSS v4 — visual dark/esports |
 | Ícones | Phosphor Icons |
 | Deploy | Vercel + Vercel Cron |
@@ -25,12 +25,17 @@ Site de bolão entre amigos para a Copa do Mundo de 2026. Sem apostas ou prêmio
    - **0 pts** — errou o resultado
    - Em mata-matas vale **sempre o placar do tempo normal (90 min)** — prorrogação e pênaltis não contam para a pontuação.
 4. **Ranking** — a home (`/`) mostra a classificação geral, com desempate por placares exatos → acertos de vencedor → jogos jogados.
+5. **Ligas (grupos)** — rankings privados entre amigos. A criação de uma liga requer pagamento único de R$ 6,00 via PIX (processado pelo Asaas). O palpite no bolão geral vale automaticamente em todas as ligas.
 
 ## Páginas
 
 - `/` — ranking geral dos participantes
 - `/jogos` — jogos por dia, com envio de palpites
 - `/jogos/[id]` — detalhe do jogo, placar ao vivo e palpites de todos os participantes
+- `/grupos` — ligas privadas do usuário; criação via pagamento PIX
+- `/grupos/[id]` — ranking e membros de uma liga
+- `/grupos/entrar/[code]` — landing de convite (acessível sem login)
+- `/grupos/pagamento/[paymentId]` — aguarda confirmação do PIX e redireciona ao grupo criado
 - `/pontuacao` — explicação das regras de pontuação
 - `/perfil` — palpites e pontos do próprio usuário
 - `/onboarding` — escolha do apelido (primeiro acesso)
@@ -43,6 +48,24 @@ Os jogos e placares vêm da football-data.org através de `syncGames()` (`src/li
 - **Ao vivo** — `/api/games/[id]/live` sincroniza sob demanda quando o dado está desatualizado e o jogo está em andamento; o front faz polling a cada 5 min.
 - **Manual** — botão na página de jogos chama `/api/games/sync` (requer usuário autenticado).
 
+## Fluxo de pagamento (ligas)
+
+```
+CreateGroupForm → POST /api/asaas/checkout
+  → cria cliente + cobrança PIX no Asaas
+  → retorna QR code (base64) + código copia-e-cola
+  → redireciona para /grupos/pagamento/[paymentId]
+
+Página de pagamento → polling GET /api/asaas/status/[paymentId] a cada 3s
+
+Asaas → POST /subscriptions/webhook (PAYMENT_RECEIVED / PAYMENT_CONFIRMED)
+  → lock atômico (updateMany WHERE status=PENDING)
+  → cria grupo + GroupMember do dono
+  → atualiza GroupPayment.groupId
+
+Polling detecta status PAID → redireciona para /grupos/[groupId]
+```
+
 ## Variáveis de ambiente
 
 Defina em `.env.local`:
@@ -54,15 +77,36 @@ AUTH_GOOGLE_ID=
 AUTH_GOOGLE_SECRET=
 
 # Banco de dados (Turso/libSQL)
-TURSO_DATABASE_URL=
-TURSO_AUTH_TOKEN=
+DATABASE_URL=
+DATABASE_AUTH_TOKEN=
 
 # API de jogos
 FOOTBALL_DATA_API_KEY=
 
 # Cron
 CRON_SECRET=
+
+# Asaas — pagamentos PIX para criação de ligas
+ASAAS_ENV=sandbox              # sandbox | production
+ASAAS_API_KEY=                 # $aact_... (use \$ para escapar o $ no .env.local)
+ASAAS_WEBHOOK_TOKEN=           # token do painel Asaas → Integrações → Webhooks
+GROUP_PRICE_CENTS=600          # valor em centavos (600 = R$ 6,00)
+NEXT_PUBLIC_GROUP_PRICE_DISPLAY=R$ 6,00
 ```
+
+> **Atenção:** a chave da Asaas começa com `$` — no `.env.local` escape com `\$` para evitar que o dotenv-expand interpole a variável:
+> ```
+> ASAAS_API_KEY=\$aact_hmlg_...
+> ```
+
+### Configuração do webhook (Asaas)
+
+1. Painel Asaas → Minha Conta → Integrações → Webhooks
+2. URL: `https://seudominio.com/subscriptions/webhook`
+3. Eventos: `PAYMENT_RECEIVED`, `PAYMENT_CONFIRMED`
+4. Copie o token de acesso e coloque em `ASAAS_WEBHOOK_TOKEN`
+
+Para testes locais use [ngrok](https://ngrok.com): `ngrok http 3000`.
 
 ## Desenvolvimento
 
@@ -85,13 +129,16 @@ Abra [http://localhost:3000](http://localhost:3000).
 
 ```
 src/
-  actions/        Server actions (ex.: salvar palpite)
+  actions/        Server actions (palpites, grupos)
   app/            Páginas (App Router) e rotas de API
-  components/     Componentes de UI (game, prediction, layout, ui)
-  lib/            Domínio: scoring, sync, football-data, auth, prisma
+    api/asaas/    Checkout PIX e polling de status
+    subscriptions/webhook/  Webhook do Asaas
+    grupos/       Ligas privadas + página de pagamento
+  components/     Componentes de UI (game, group, prediction, layout, ui)
+  lib/            Domínio: scoring, sync, football-data, auth, prisma, asaas
   middleware.ts   Proteção de rotas e fluxo de onboarding
 prisma/           Schema do banco
-.specs/           Especificações de cada feature
+docs/             Documentação interna de features
 ```
 
 > **Nota:** este projeto usa uma versão do Next.js com mudanças em relação ao comportamento conhecido. Antes de escrever código, consulte os guias em `node_modules/next/dist/docs/` (ver `AGENTS.md`).

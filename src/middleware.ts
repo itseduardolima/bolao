@@ -18,7 +18,9 @@ export default auth((req) => {
     path.startsWith('/grupos/entrar') || // landing de convite: visível deslogado
     path.startsWith('/api/auth') ||
     path.startsWith('/api/cron') ||
-    path.startsWith('/api/games')
+    path.startsWith('/api/games') ||
+    path.startsWith('/api/asaas') ||
+    path.startsWith('/subscriptions/')
 
   const isApiPath = path.startsWith('/api/')
 

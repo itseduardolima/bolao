@@ -56,29 +56,9 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.length > 0
 }
 
-/** Cria um grupo (o criador vira dono/membro). */
-export async function createGroup(rawName: unknown): Promise<CreateGroupResult> {
-  const user = await requireUser()
-  if (!user) return { error: NOT_AUTHED }
-  if (!(await hasNicknameInDb(user.id))) return { error: NO_PROFILE }
-
-  const name = normalizeGroupName(rawName)
-  if (!name) {
-    return { error: `O nome deve ter entre ${GROUP_NAME_MIN} e ${GROUP_NAME_MAX} caracteres` }
-  }
-
-  const owned = await prisma.group.count({ where: { ownerId: user.id } })
-  if (owned >= MAX_GROUPS_OWNED) {
-    return { error: `Você atingiu o limite de ${MAX_GROUPS_OWNED} grupos criados` }
-  }
-
-  try {
-    const group = await createGroupWithUniqueCode(name, user.id)
-    revalidatePath('/grupos')
-    return { success: true, groupId: group.id }
-  } catch {
-    return { error: 'Erro ao criar grupo. Tente novamente.' }
-  }
+/** Criação de grupos requer pagamento via /api/asaas/checkout. */
+export async function createGroup(_rawName: unknown): Promise<CreateGroupResult> {
+  return { error: 'Criação de grupos requer pagamento via PIX.' }
 }
 
 /** Entra em um grupo a partir do código de convite (capability). Idempotente. */

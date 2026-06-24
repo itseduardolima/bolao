@@ -129,7 +129,7 @@ export default async function GroupDetailPage({
       <div className="mt-[26px]">
         <GroupTabs
           tabs={[
-            { id: 'ranking', label: 'Classificação', content: <RankingTable entries={ranking} /> },
+            { id: 'ranking', label: 'Classificação', content: <RankingTable entries={ranking} currentUserId={userId} /> },
             { id: 'membros', label: 'Membros', content: membersPanel },
           ]}
         />

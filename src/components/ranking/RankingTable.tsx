@@ -22,7 +22,7 @@ export default function RankingTable({
   }
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto mt-4">
       <table className="w-full border-collapse">
         <thead>
           <tr>

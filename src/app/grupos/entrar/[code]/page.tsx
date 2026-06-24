@@ -1,7 +1,8 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { notFound } from 'next/navigation'
 import { auth } from '@/lib/auth'
+import LogoCopa from '@/assets/images/logo-copa.png'
 import { prisma } from '@/lib/prisma'
 import { normalizeInviteCode } from '@/lib/group-constants'
 import MemberStack from '@/components/group/MemberStack'
@@ -15,8 +16,10 @@ function InvalidInvite() {
     <div className="min-h-screen flex flex-col items-center justify-center text-center px-6 py-20">
       {/* logo */}
       <div className="flex items-center justify-center gap-[9px] mb-10">
-        <div className="w-4 h-4 bg-accent rounded-[4px]" />
-        <span className="font-barlow text-[18px] font-black text-primary">BOLÃO<span className="text-accent">26</span></span>
+        <Image src={LogoCopa} alt="Bolão 2026" width={28} height={28} />
+        <span className="font-barlow text-[18px] font-black text-primary">
+          Bolão - Copa do Mundo<span className="text-accent ml-2">2026</span>
+        </span>
       </div>
       {/* error circle */}
       <div className="w-14 h-14 rounded-full bg-error/[.13] flex items-center justify-center font-barlow text-[28px] font-bold text-error">!</div>
@@ -76,9 +79,9 @@ export default async function JoinInvitePage({
     <div className="min-h-screen flex flex-col items-center justify-center text-center px-8 py-[72px]">
       {/* logo */}
       <div className="flex items-center justify-center gap-[9px] mb-[40px]">
-        <div className="w-4 h-4 bg-accent rounded-[4px]" />
+        <Image src={LogoCopa} alt="Bolão 2026" width={28} height={28} />
         <span className="font-barlow text-[18px] font-black text-primary">
-          BOLÃO<span className="text-accent">26</span>
+          Bolão - Copa do Mundo<span className="text-accent ml-1">2026</span>
         </span>
       </div>
       {/* eyebrow */}
@@ -129,7 +132,7 @@ export default async function JoinInvitePage({
         )}
       </div>
       {/* fine print */}
-      <p className="font-inter text-[12px] text-[rgba(255,255,255,.27)] max-w-[420px] mt-8">
+      <p className="font-inter text-[12px] text-[rgba(255,255,255,.42)] max-w-[420px] mt-8">
         Entrando, você passa a disputar o ranking desta liga. Seus palpites continuam os mesmos do bolão geral.
       </p>
     </div>

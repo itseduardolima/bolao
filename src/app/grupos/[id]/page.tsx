@@ -136,7 +136,7 @@ export default async function GroupDetailPage({
       </div>
 
       {/* Zona de risco */}
-      <div className="mt-[30px] pt-5 border-t border-white/[.06] flex justify-end">
+      <div className="mt-[30px] pt-5 border-white/[.06] flex justify-end">
         <GroupActions groupId={group.id} isOwner={isOwner} />
       </div>
     </div>

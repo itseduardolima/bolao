@@ -55,7 +55,14 @@ export async function upsertCustomer(
 ): Promise<AsaasCustomer> {
   const cpfClean = cpf.replace(/\D/g, '')
   const search = await call(`/customers?email=${encodeURIComponent(email)}&limit=1`) as { data?: AsaasCustomer[] }
-  if (search.data && search.data.length > 0) return search.data[0]
+  if (search.data && search.data.length > 0) {
+    const existing = search.data[0]
+    await call(`/customers/${existing.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ cpfCnpj: cpfClean }),
+    })
+    return existing
+  }
   return call('/customers', {
     method: 'POST',
     body: JSON.stringify({
@@ -74,7 +81,8 @@ export async function createPixCharge(
   description: string,
   externalReference: string
 ): Promise<AsaasPayment> {
-  const dueDate = new Date(Date.now() + 30 * 60 * 1000)
+  // Brazil is UTC-3; use local date so Asaas doesn't reject as already-due near midnight UTC
+  const dueDate = new Date(Date.now() + 30 * 60 * 1000 - 3 * 60 * 60 * 1000)
     .toISOString()
     .split('T')[0]
   return call('/payments', {

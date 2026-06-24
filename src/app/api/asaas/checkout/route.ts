@@ -36,8 +36,18 @@ export async function POST(req: Request) {
   }
 
   const userId = session.user.id
-  const ownedCount = await prisma.group.count({ where: { ownerId: userId } })
-  if (ownedCount >= MAX_GROUPS_OWNED) {
+
+  const [profile, ownedCount, pendingCount] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId }, select: { hasNickname: true } }),
+    prisma.group.count({ where: { ownerId: userId } }),
+    prisma.groupPayment.count({ where: { userId, status: 'PENDING' } }),
+  ])
+
+  if (!profile?.hasNickname) {
+    return NextResponse.json({ error: 'Complete seu perfil antes de criar uma liga' }, { status: 422 })
+  }
+
+  if (ownedCount + pendingCount >= MAX_GROUPS_OWNED) {
     return NextResponse.json(
       { error: `Limite de ${MAX_GROUPS_OWNED} grupos criados atingido` },
       { status: 422 }

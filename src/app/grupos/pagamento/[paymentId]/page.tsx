@@ -39,6 +39,7 @@ export default function PagamentoPage({
         .then((r) => r.json())
         .then((json: { status: string; groupId?: string }) => {
           if (json.status === 'PAID') {
+            if (!json.groupId) return // webhook still writing groupId — keep polling
             clearInterval(pollRef.current!)
             clearTimeout(expireRef.current!)
             sessionStorage.removeItem(`gp_${paymentId}`)
@@ -72,8 +73,7 @@ export default function PagamentoPage({
   if (!data) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ width: 20, height: 20, border: '2px solid rgba(0,255,135,.3)', borderTopColor: '#00ff87', borderRadius: '50%', display: 'inline-block', animation: 'spin .8s linear infinite' }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <span className="animate-spin inline-block w-5 h-5 rounded-full border-2 border-[rgba(0,255,135,.3)] border-t-[#00ff87]" />
       </div>
     )
   }
@@ -135,7 +135,7 @@ export default function PagamentoPage({
                 />
               ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ width: 20, height: 20, border: '2px solid rgba(0,255,135,.3)', borderTopColor: '#00ff87', borderRadius: '50%', display: 'inline-block', animation: 'spin .8s linear infinite' }} />
+                  <span className="animate-spin inline-block w-5 h-5 rounded-full border-2 border-[rgba(0,255,135,.3)] border-t-[#00ff87]" />
                 </div>
               )}
             </div>
@@ -167,7 +167,7 @@ export default function PagamentoPage({
 
           {/* Spinner + status */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 18 }}>
-            <span style={{ width: 20, height: 20, border: '2px solid rgba(0,255,135,.3)', borderTopColor: '#00ff87', borderRadius: '50%', display: 'inline-block', animation: 'spin .8s linear infinite', flexShrink: 0 }} />
+            <span className="animate-spin inline-block shrink-0 w-5 h-5 rounded-full border-2 border-[rgba(0,255,135,.3)] border-t-[#00ff87]" />
             <span style={{ fontFamily: 'Inter,sans-serif', fontSize: 13, color: 'rgba(255,255,255,.55)' }}>
               Aguardando confirmação do pagamento…
             </span>
@@ -177,7 +177,6 @@ export default function PagamentoPage({
             Após o pagamento, a liga é criada automaticamente em instantes. Não feche esta página.
           </div>
         </div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }

@@ -13,16 +13,8 @@ interface AsaasWebhookPayload {
 
 export async function POST(req: Request) {
   const WEBHOOK_TOKEN = process.env.ASAAS_WEBHOOK_TOKEN
-  const token = req.headers.get('asaas-access-token')
-
-  if (WEBHOOK_TOKEN) {
-    // Token configured → enforce validation
-    if (token !== WEBHOOK_TOKEN) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  } else {
-    // Token not configured → allow but warn (set ASAAS_WEBHOOK_TOKEN in production)
-    console.warn('[webhook] ASAAS_WEBHOOK_TOKEN não configurado — endpoint desprotegido')
+  if (!WEBHOOK_TOKEN || req.headers.get('asaas-access-token') !== WEBHOOK_TOKEN) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   let payload: AsaasWebhookPayload
@@ -59,16 +51,18 @@ export async function POST(req: Request) {
   })
   if (locked.count === 0) return NextResponse.json({ ok: true })
 
-  try {
-    const group = await createGroupWithUniqueCode(gpay.groupName, gpay.userId)
-    await prisma.groupPayment.update({
-      where: { id: gpayId },
-      data: { groupId: group.id },
-    })
-  } catch (err) {
-    console.error('[webhook] Failed to create group after payment lock:', err)
-    // Payment is already marked PAID — log for manual recovery rather than
-    // returning non-2xx (which would cause Asaas to retry and hit count=0).
+  let group: { id: string } | null = null
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      group = await createGroupWithUniqueCode(gpay.groupName, gpay.userId)
+      break
+    } catch (err) {
+      if (attempt === 2) console.error('[webhook] Failed to create group after 3 attempts (payment PAID, groupId null — manual recovery needed):', err)
+      else await new Promise(r => setTimeout(r, 600 * (attempt + 1)))
+    }
+  }
+  if (group) {
+    await prisma.groupPayment.update({ where: { id: gpayId }, data: { groupId: group.id } })
   }
 
   return NextResponse.json({ ok: true })

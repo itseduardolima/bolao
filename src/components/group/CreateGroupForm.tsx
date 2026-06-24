@@ -72,6 +72,7 @@ export default function CreateGroupForm() {
                 border: `1px solid ${nameValid ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.1)'}`,
                 borderRadius: 10, color: '#fff',
                 font: '500 14px Inter,sans-serif', outline: 'none',
+                fontSize: 16
               }}
             />
             <button
@@ -134,11 +135,7 @@ export default function CreateGroupForm() {
               }}
             >
               {loading && (
-                <span style={{
-                  width: 15, height: 15, border: '2px solid rgba(15,15,26,.35)',
-                  borderTopColor: '#0f0f1a', borderRadius: '50%', display: 'inline-block',
-                  animation: 'spin .7s linear infinite',
-                }} />
+                <span className="animate-spin inline-block w-[15px] h-[15px] rounded-full border-2 border-[rgba(15,15,26,.35)] border-t-[#0f0f1a]" />
               )}
               {loading ? 'Gerando cobrança…' : `Pagar ${PRICE_DISPLAY} via PIX`}
             </button>
@@ -150,7 +147,6 @@ export default function CreateGroupForm() {
             )}
           </>
         )}
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }

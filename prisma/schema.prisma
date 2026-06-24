@@ -19,6 +19,7 @@ model User {
   predictions   Prediction[]
   ownedGroups   Group[]       @relation("OwnedGroups")
   groupMembers  GroupMember[]
+  groupPayments GroupPayment[]
 }
 
 model Group {
@@ -98,6 +99,23 @@ model Game {
   createdAt       DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   predictions Prediction[]
+}
+
+model GroupPayment {
+  id        String    @id @default(cuid())
+  userId    String
+  groupName String
+  asaasId   String    @unique
+  status    String    @default("PENDING")
+  groupId   String?
+  pixCode   String?
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([asaasId])
 }
 
 model Prediction {

@@ -1,9 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, PencilSimple } from '@phosphor-icons/react/dist/ssr'
-import { cn, formatGameTime } from '@/lib/utils'
+import { formatGameTime } from '@/lib/utils'
 import { StatusBadge } from '@/components/ui/Badge'
-import LiveScore from '@/components/game/LiveScore'
 import type { GameStatus } from '@/types'
 
 type GameCardProps = {
@@ -16,9 +14,25 @@ type GameCardProps = {
   status: GameStatus
   homeScore: number | null
   awayScore: number | null
+  phase?: string
   prediction?: { homeScore: number; awayScore: number; points: number | null } | null
   isAuthenticated?: boolean
-  className?: string
+}
+
+function toCode(name: string): string {
+  return name.slice(0, 3).toUpperCase()
+}
+
+function PointsBadge({ points }: { points: number }) {
+  if (points === 3) return (
+    <span className="font-barlow text-[12px] font-bold text-accent bg-[rgba(0,255,135,.12)] rounded-[6px] px-[10px] py-[3px]">+3</span>
+  )
+  if (points === 1) return (
+    <span className="font-barlow text-[12px] font-bold text-warning bg-[rgba(245,158,11,.14)] rounded-[6px] px-[10px] py-[3px]">+1</span>
+  )
+  return (
+    <span className="font-barlow text-[12px] font-bold text-[rgba(255,255,255,.5)] bg-[rgba(255,255,255,.07)] rounded-[6px] px-[10px] py-[3px]">0</span>
+  )
 }
 
 export default function GameCard({
@@ -31,113 +45,62 @@ export default function GameCard({
   status,
   homeScore,
   awayScore,
+  phase,
   prediction,
   isAuthenticated,
-  className,
 }: GameCardProps) {
   const showScore = status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED'
+  const scoreColor = showScore ? '#fff' : 'rgba(255,255,255,.3)'
+  const scoreOrTime = showScore
+    ? `${homeScore ?? 0} - ${awayScore ?? 0}`
+    : 'VS'
 
   return (
     <Link
       href={`/jogos/${id}`}
-      className={cn(
-        'block rounded-xl border border-border bg-surface p-5 transition-transform hover:-translate-y-0.5 hover:shadow-[0_4px_20px_#00ff8715]',
-        className
-      )}
+      className="block bg-surface border border-border rounded-[12px] p-[16px_18px] cursor-pointer hover:border-[rgba(255,255,255,.16)] hover:bg-[#1a1a30] transition-colors"
     >
-      <div className="mb-3 flex items-center justify-between">
+      <div className="flex items-center justify-between">
+        <span className="font-[Barlow_Condensed] text-[10px] font-semibold tracking-[.12em] text-[rgba(255,255,255,.42)] uppercase">{phase}</span>
         <StatusBadge status={status} />
-        {!showScore && (
-          <span className="font-inter text-sm text-secondary">
-            {formatGameTime(startsAt)}
-          </span>
-        )}
       </div>
 
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-1 flex-col items-center gap-2">
-          {homeFlag ? (
-            <Image src={homeFlag} alt={homeTeam} width={40} height={40} className="rounded-sm object-contain" />
-          ) : (
-            <div className="h-10 w-10 rounded-sm bg-elevated" />
-          )}
-          <span className="text-center font-barlow text-[17px] font-bold uppercase text-primary">
-            {homeTeam}
-          </span>
+      <div className="flex items-center justify-between mt-[14px]">
+        <div className="flex items-center gap-[10px] flex-1 min-w-0">
+          {homeFlag
+            ? <Image src={homeFlag} alt={homeTeam} width={26} height={18} className="rounded-[3px] object-cover flex-shrink-0" />
+            : <div className="w-[26px] h-[18px] rounded-[3px] bg-elevated flex-shrink-0" />}
+          <span className="font-barlow text-[16px] font-bold text-primary">{toCode(homeTeam)}</span>
         </div>
-
-        <div className="flex min-w-[80px] flex-col items-center">
-          {showScore ? (
-            status === 'LIVE' || status === 'PAUSED' ? (
-              <LiveScore
-                gameId={id}
-                initialStatus={status}
-                initialHomeScore={homeScore}
-                initialAwayScore={awayScore}
-              />
-            ) : (
-              <span className="font-barlow text-[40px] font-black leading-none text-accent">
-                {homeScore ?? 0} × {awayScore ?? 0}
-              </span>
-            )
-          ) : (
-            <span className="font-barlow text-xl font-bold text-secondary">VS</span>
-          )}
+        <div className="font-barlow text-[22px] font-extrabold px-[12px] flex-shrink-0" style={{ color: scoreColor }}>
+          {scoreOrTime}
         </div>
-
-        <div className="flex flex-1 flex-col items-center gap-2">
-          {awayFlag ? (
-            <Image src={awayFlag} alt={awayTeam} width={40} height={40} className="rounded-sm object-contain" />
-          ) : (
-            <div className="h-10 w-10 rounded-sm bg-elevated" />
-          )}
-          <span className="text-center font-barlow text-[17px] font-bold uppercase text-primary">
-            {awayTeam}
-          </span>
+        <div className="flex items-center gap-[10px] flex-1 min-w-0 justify-end">
+          <span className="font-barlow text-[16px] font-bold text-primary">{toCode(awayTeam)}</span>
+          {awayFlag
+            ? <Image src={awayFlag} alt={awayTeam} width={26} height={18} className="rounded-[3px] object-cover flex-shrink-0" />
+            : <div className="w-[26px] h-[18px] rounded-[3px] bg-elevated flex-shrink-0" />}
         </div>
       </div>
 
-      <div className="mt-4 border-t border-border pt-3">
-        {prediction ? (
-          <div className="flex items-center justify-between">
-            <span className="font-inter text-xs text-secondary">
-              Seu palpite:{' '}
-              <span className="text-secondary">
-                {prediction.homeScore} × {prediction.awayScore}
+      <div className="mt-[14px] pt-[12px] border-t border-border flex items-center justify-between min-h-[24px]">
+        <span className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)]">
+          {status === 'SCHEDULED' ? formatGameTime(startsAt) : ''}
+        </span>
+        <div className="flex items-center gap-[8px]">
+          {prediction ? (
+            <>
+              <span className="font-inter text-[12px] font-semibold text-[rgba(255,255,255,.7)]">
+                Palpite {prediction.homeScore} × {prediction.awayScore}
               </span>
-            </span>
-            {prediction.points !== null ? (
-              <span
-                className={cn(
-                  'rounded-full px-2 py-0.5 font-inter text-xs font-semibold',
-                  prediction.points === 3 && 'bg-accent-dim text-accent border border-accent-border',
-                  prediction.points === 1 && 'bg-warning-dim text-warning border border-warning-border',
-                  prediction.points === 0 && 'bg-elevated text-secondary'
-                )}
-              >
-                {prediction.points === 3 ? '+3 pts' : prediction.points === 1 ? '+1 pt' : '0 pts'}
-              </span>
-            ) : (
-              <span className="font-inter text-xs text-secondary">aguardando</span>
-            )}
-          </div>
-        ) : isAuthenticated ? (
-          <span className="flex items-center gap-1 font-inter text-xs text-accent">
-            {status === 'SCHEDULED' ? (
-              <>
-                <PencilSimple size={12} weight="bold" />
-                Palpitar
-              </>
-            ) : (
-              <>
-                Ver detalhes
-                <ArrowRight size={12} weight="bold" />
-              </>
-            )}
-          </span>
-        ) : (
-          <span className="font-inter text-xs text-secondary">Entre para palpitar</span>
-        )}
+              {prediction.points !== null && <PointsBadge points={prediction.points} />}
+            </>
+          ) : isAuthenticated && status === 'SCHEDULED' ? (
+            <span className="font-inter text-[12px] font-semibold text-accent cursor-pointer">Palpitar →</span>
+          ) : isAuthenticated ? (
+            <span className="font-inter text-[12px] font-semibold text-[rgba(255,255,255,.55)]">Ver detalhes →</span>
+          ) : null}
+        </div>
       </div>
     </Link>
   )

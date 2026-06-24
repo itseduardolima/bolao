@@ -81,16 +81,24 @@ export default async function JogosPage({
   return (
     <main>
       <Container>
-        <DateNav dates={dates} selectedDate={selectedDate} today={toLocalDate(new Date())} />
-
-        <div className="mb-3 flex justify-end">
+        <div className="flex items-end justify-between gap-4 mb-[22px]">
+          <div>
+            <div className="font-[Barlow_Condensed] text-[12px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
+              Copa do Mundo 2026
+            </div>
+            <h1 className="font-barlow text-[38px] font-extrabold text-primary mt-[6px]">
+              Jogos
+            </h1>
+          </div>
           <SyncGamesButton />
         </div>
+
+        <DateNav dates={dates} selectedDate={selectedDate} today={toLocalDate(new Date())} />
 
         {dayGames.length === 0 ? (
           <p className="text-secondary">Nenhum jogo nesta data.</p>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-[14px]">
             {dayGames.map((game) => (
               <GameCard
                 key={game.id}
@@ -99,6 +107,7 @@ export default async function JogosPage({
                 status={game.status as GameStatus}
                 prediction={predictionMap.get(game.id) ?? null}
                 isAuthenticated={!!userId}
+                phase={game.phase ?? undefined}
               />
             ))}
           </div>

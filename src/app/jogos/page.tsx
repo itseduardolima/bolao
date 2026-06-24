@@ -4,6 +4,7 @@ import Container from '@/components/layout/Container'
 import GameCard from '@/components/game/GameCard'
 import DateNav from '@/components/game/DateNav'
 import SyncGamesButton from '@/components/game/SyncGamesButton'
+import LiveRefresh from '@/components/game/LiveRefresh'
 import type { GameStatus } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -77,9 +78,13 @@ export default async function JogosPage({
     : []
 
   const predictionMap = new Map(userPredictions.map((p) => [p.gameId, p]))
+  const hasLiveGames = dayGames.some(
+    (g) => g.status === 'LIVE' || g.status === 'PAUSED'
+  )
 
   return (
     <main>
+      <LiveRefresh active={hasLiveGames} />
       <Container>
         <div className="flex items-end justify-between gap-4 mb-[22px]">
           <div>

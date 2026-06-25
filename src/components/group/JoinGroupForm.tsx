@@ -39,7 +39,7 @@ export default function JoinGroupForm() {
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             maxLength={INVITE_CODE_LENGTH}
             placeholder="A1B2C3D4"
-            className="flex-1 min-w-0 h-[42px] px-[14px] bg-base border border-white/10 rounded-[10px] text-primary font-mono text-[14px] tracking-[.18em] uppercase outline-none focus:border-white/25 transition-colors placeholder:text-muted placeholder:tracking-normal placeholder:normal-case"
+            className="flex-1 min-w-0 h-[42px] px-[14px] bg-base border border-white/10 rounded-[10px] text-primary font-mono text-[16px] tracking-[.18em] uppercase outline-none focus:border-white/25 transition-colors placeholder:text-muted placeholder:tracking-normal placeholder:normal-case"
           />
           <button
             type="submit"

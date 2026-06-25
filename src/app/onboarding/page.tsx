@@ -1,23 +1,26 @@
 'use client'
 
 import Image from 'next/image'
+import { cn } from '@/lib/utils'
+import Spinner from '@/components/ui/Spinner'
+import Button from '@/components/ui/Button'
 import LogoCopa from '@/assets/images/logo-copa.png'
 import { useOnboarding } from './useOnboarding'
 
 export default function OnboardingPage() {
   const { value, setValue, status, error, isSaving, canSubmit, handleSubmit } = useOnboarding()
 
-  const borderColor = status === 'available'
-    ? '#00ff87'
+  const borderClass = status === 'available'
+    ? 'border-accent'
     : status === 'unavailable' || status === 'invalid'
-    ? '#ef4444'
-    : 'rgba(255,255,255,.14)'
+    ? 'border-[#ef4444]'
+    : 'border-white/[14%]'
 
-  const hintColor = status === 'available'
-    ? '#00ff87'
+  const hintClass = status === 'available'
+    ? 'text-accent'
     : status === 'unavailable'
-    ? '#ef4444'
-    : 'rgba(255,255,255,.42)'
+    ? 'text-[#ef4444]'
+    : 'text-white/[42%]'
 
   const hintText = status === 'checking'
     ? 'Verificando…'
@@ -58,12 +61,14 @@ export default function OnboardingPage() {
               autoCorrect="off"
               autoCapitalize="none"
               spellCheck={false}
-              className="w-full h-[54px] px-[16px] pr-[46px] bg-base-dark text-primary font-inter text-[16px] font-semibold outline-none rounded-[12px] transition-colors"
-              style={{ border: `1px solid ${borderColor}`, boxSizing: 'border-box' }}
+              className={cn(
+                'w-full h-[54px] px-[16px] pr-[46px] bg-base-dark text-primary font-inter text-[16px] font-semibold outline-none rounded-[12px] border transition-colors',
+                borderClass
+              )}
             />
 
             {status === 'checking' && (
-              <span className="absolute right-[16px] top-[19px] w-[16px] h-[16px] border-2 border-[rgba(255,255,255,.2)] border-t-white rounded-full inline-block animate-spin" />
+              <Spinner tone="light" className="absolute right-[16px] top-[19px] h-4 w-4" />
             )}
 
             {status === 'available' && (
@@ -80,7 +85,7 @@ export default function OnboardingPage() {
           </div>
 
           {hintText && (
-            <div className="font-inter text-[12.5px] font-medium mt-[10px] px-[2px]" style={{ color: hintColor }}>
+            <div className={cn('font-inter text-[12.5px] font-medium mt-[10px] px-[2px]', hintClass)}>
               {hintText}
             </div>
           )}
@@ -89,16 +94,17 @@ export default function OnboardingPage() {
             <p className="font-inter text-[13px] text-error mt-[10px]">{error}</p>
           )}
 
-          <button
+          <Button
             type="submit"
-            disabled={!canSubmit || isSaving}
-            className="w-full h-[48px] mt-[20px] bg-accent text-black rounded-[12px] font-inter text-[15px] font-bold flex items-center justify-center gap-[8px] disabled:opacity-50 transition-opacity cursor-pointer disabled:cursor-not-allowed"
+            variant="cta"
+            size="lg"
+            fullWidth
+            loading={isSaving}
+            disabled={!canSubmit}
+            className="mt-[20px]"
           >
-            {isSaving && (
-              <span className="w-[15px] h-[15px] border-2 border-[rgba(0,0,0,.3)] border-t-black rounded-full inline-block animate-spin" />
-            )}
             {isSaving ? 'Salvando…' : 'Confirmar apelido'}
-          </button>
+          </Button>
         </form>
       </div>
     </main>

@@ -2,7 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils'
+import Card from '@/components/ui/Card'
+import Eyebrow from '@/components/ui/Eyebrow'
+import Button from '@/components/ui/Button'
 import { GROUP_NAME_MIN, GROUP_NAME_MAX } from '@/lib/group-constants'
+
+const INPUT_BASE =
+  'flex-1 min-w-0 h-[42px] px-[14px] bg-base rounded-[10px] text-primary font-inter text-[16px] font-medium outline-none transition-colors border'
 
 const PRICE_DISPLAY = process.env.NEXT_PUBLIC_GROUP_PRICE_DISPLAY ?? 'R$ 6,00'
 
@@ -54,100 +61,75 @@ export default function CreateGroupForm() {
   }
 
   return (
-    <div style={{ background: '#16162a', border: '1px solid rgba(255,255,255,.06)', borderRadius: 16, padding: 18 }}>
-        <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: '.2em', color: 'rgba(255,255,255,.42)', textTransform: 'uppercase' }}>
-          Criar nova liga
+    <Card className="rounded-2xl p-[18px]">
+      <Eyebrow>Criar nova liga</Eyebrow>
+
+      {step === 1 ? (
+        <div className="flex gap-2 mt-3">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Nome da liga"
+            maxLength={GROUP_NAME_MAX}
+            className={cn(INPUT_BASE, nameValid ? 'border-white/25' : 'border-white/10')}
+          />
+          <Button
+            type="button"
+            variant="cta"
+            disabled={!nameValid}
+            onClick={() => { setError(null); setStep(2) }}
+            className="shrink-0 h-[42px] px-5 text-[14px]"
+          >
+            Próximo
+          </Button>
         </div>
+      ) : (
+        <>
+          <button
+            type="button"
+            onClick={() => { setStep(1); setError(null) }}
+            className="inline-flex items-center gap-[7px] mt-[13px] font-inter text-[12px] font-medium text-white/[42%] cursor-pointer"
+          >
+            <span className="inline-block w-[6px] h-[6px] border-l-2 border-b-2 border-current rotate-45" />
+            {trimmedName}
+          </button>
 
-        {step === 1 ? (
-          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nome da liga"
-              maxLength={GROUP_NAME_MAX}
-              style={{
-                flex: 1, minWidth: 0, height: 42, padding: '0 14px',
-                background: '#0f0f1a',
-                border: `1px solid ${nameValid ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.1)'}`,
-                borderRadius: 10, color: '#fff',
-                font: '500 14px Inter,sans-serif', outline: 'none',
-                fontSize: 16
-              }}
-            />
-            <button
-              type="button"
-              disabled={!nameValid}
-              onClick={() => { setError(null); setStep(2) }}
-              style={{
-                flexShrink: 0, height: 42, padding: '0 20px', border: 'none',
-                borderRadius: 12, fontFamily: 'Inter,sans-serif', fontSize: 14, fontWeight: 700,
-                background: '#00ff87', color: '#0f0f1a',
-                opacity: nameValid ? 1 : 0.4,
-                cursor: nameValid ? 'pointer' : 'not-allowed',
-              }}
-            >
-              Próximo
-            </button>
+          <div className="font-inter text-[12px] font-medium text-white/55 mt-[14px]">
+            CPF do pagador
           </div>
-        ) : (
-          <>
-            <div
-              onClick={() => { setStep(1); setError(null) }}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,.42)', cursor: 'pointer', marginTop: 13 }}
-            >
-              <span style={{ display: 'inline-block', width: 6, height: 6, borderLeft: '2px solid currentColor', borderBottom: '2px solid currentColor', transform: 'rotate(45deg)' }} />
-              {trimmedName}
-            </div>
-
-            <div style={{ fontFamily: 'Inter,sans-serif', fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,.55)', marginTop: 14 }}>
-              CPF do pagador
-            </div>
-            <input
-              value={cpf}
-              onChange={(e) => setCpf(maskCpf(e.target.value))}
-              placeholder="000.000.000-00"
-              inputMode="numeric"
-              autoFocus
-              style={{
-                width: '100%', boxSizing: 'border-box', height: 42, padding: '0 14px', marginTop: 7,
-                background: '#0f0f1a',
-                border: `1px solid ${cpfValid ? 'rgba(0,255,135,.4)' : 'rgba(255,255,255,.1)'}`,
-                borderRadius: 10, color: '#fff',
-                font: '500 14px Inter,sans-serif', outline: 'none', letterSpacing: '.02em',
-                fontSize: 16
-              }}
-            />
-            <div style={{ fontFamily: 'Inter,sans-serif', fontSize: 11, lineHeight: 1.4, color: 'rgba(255,255,255,.3)', fontStyle: 'italic', marginTop: 8 }}>
-              Usado apenas para emissão da cobrança PIX. Não armazenamos seu CPF.
-            </div>
-
-            <button
-              type="button"
-              disabled={!cpfValid || loading}
-              onClick={handlePay}
-              style={{
-                width: '100%', height: 44, marginTop: 16, border: 'none',
-                borderRadius: 12, fontFamily: 'Inter,sans-serif', fontSize: 14, fontWeight: 700,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
-                background: '#00ff87', color: '#0f0f1a',
-                opacity: (!cpfValid || loading) ? (loading ? 0.8 : 0.4) : 1,
-                cursor: loading ? 'wait' : cpfValid ? 'pointer' : 'not-allowed',
-              }}
-            >
-              {loading && (
-                <span className="animate-spin inline-block w-[15px] h-[15px] rounded-full border-2 border-[rgba(15,15,26,.35)] border-t-[#0f0f1a]" />
-              )}
-              {loading ? 'Gerando cobrança…' : `Pagar ${PRICE_DISPLAY} via PIX`}
-            </button>
-
-            {error && (
-              <div style={{ fontFamily: 'Inter,sans-serif', fontSize: 12, color: '#ff4d6d', marginTop: 8 }}>
-                {error}
-              </div>
+          <input
+            value={cpf}
+            onChange={(e) => setCpf(maskCpf(e.target.value))}
+            placeholder="000.000.000-00"
+            inputMode="numeric"
+            autoFocus
+            className={cn(
+              'w-full h-[42px] px-[14px] mt-[7px] bg-base rounded-[10px] text-primary font-inter text-[16px] font-medium tracking-[.02em] outline-none transition-colors border',
+              cpfValid ? 'border-accent/40' : 'border-white/10'
             )}
-          </>
-        )}
-    </div>
+          />
+          <div className="font-inter text-[11px] leading-[1.4] italic text-white/30 mt-2">
+            Usado apenas para emissão da cobrança PIX. Não armazenamos seu CPF.
+          </div>
+
+          <Button
+            type="button"
+            variant="cta"
+            size="lg"
+            fullWidth
+            loading={loading}
+            disabled={!cpfValid}
+            onClick={handlePay}
+            className="h-11 mt-4 text-[14px]"
+          >
+            {loading ? 'Gerando cobrança…' : `Pagar ${PRICE_DISPLAY} via PIX`}
+          </Button>
+
+          {error && (
+            <div className="font-inter text-[12px] text-error mt-2">{error}</div>
+          )}
+        </>
+      )}
+    </Card>
   )
 }

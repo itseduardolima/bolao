@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import Card from '@/components/ui/Card'
+import Eyebrow from '@/components/ui/Eyebrow'
 import { joinGroup } from '@/actions/groups'
 import { INVITE_CODE_LENGTH, normalizeInviteCode } from '@/lib/group-constants'
 
@@ -28,10 +30,8 @@ export default function JoinGroupForm() {
   }
 
   return (
-    <div className="bg-surface border border-border rounded-xl p-[18px] pb-5">
-      <div className="font-barlow text-[11px] font-semibold uppercase tracking-[.2em] text-[rgba(255,255,255,.42)]">
-        Entrar com código
-      </div>
+    <Card className="p-[18px] pb-5">
+      <Eyebrow>Entrar com código</Eyebrow>
       <form onSubmit={handleSubmit}>
         <div className="flex gap-2 mt-3">
           <input
@@ -53,6 +53,6 @@ export default function JoinGroupForm() {
           <div className="font-inter text-[12px] text-error mt-2">{error}</div>
         )}
       </form>
-    </div>
+    </Card>
   )
 }

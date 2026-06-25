@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { formatCountdown } from '@/lib/utils'
+import Button from '@/components/ui/Button'
 import { savePrediction } from '@/actions/predictions'
 
 const COUNTDOWN_THRESHOLD_MS = 5 * 60 * 1000
@@ -102,16 +103,16 @@ export default function PredictionForm({
             inputMode="numeric"
             placeholder="0"
             disabled={isPending}
-            className="w-[72px] h-[72px] text-center bg-base-dark border border-[rgba(255,255,255,.14)] rounded-[14px] text-primary font-barlow text-[34px] font-extrabold outline-none focus:border-accent transition-colors"
+            className="w-[72px] h-[72px] text-center bg-base-dark border border-white/[14%] rounded-[14px] text-primary font-barlow text-[34px] font-extrabold outline-none focus:border-accent transition-colors"
           />
-          <span className="font-barlow text-[24px] font-bold text-[rgba(255,255,255,.3)]">×</span>
+          <span className="font-barlow text-[24px] font-bold text-white/30">×</span>
           <input
             value={awayScore}
             onChange={e => setAwayScore(e.target.value)}
             inputMode="numeric"
             placeholder="0"
             disabled={isPending}
-            className="w-[72px] h-[72px] text-center bg-base-dark border border-[rgba(255,255,255,.14)] rounded-[14px] text-primary font-barlow text-[34px] font-extrabold outline-none focus:border-accent transition-colors"
+            className="w-[72px] h-[72px] text-center bg-base-dark border border-white/[14%] rounded-[14px] text-primary font-barlow text-[34px] font-extrabold outline-none focus:border-accent transition-colors"
           />
         </div>
 
@@ -121,16 +122,17 @@ export default function PredictionForm({
           </div>
         )}
 
-        <button
+        <Button
           type="submit"
+          variant="cta"
+          size="lg"
+          fullWidth
+          loading={isPending}
           disabled={!canSubmit}
-          className="w-full h-[48px] mt-[18px] bg-accent text-black rounded-[12px] font-inter text-[14px] font-bold flex items-center justify-center gap-[8px] disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+          className="h-[48px] mt-[18px] text-[14px]"
         >
-          {isPending && (
-            <span className="w-[15px] h-[15px] border-2 border-[rgba(0,0,0,.3)] border-t-black rounded-full inline-block animate-spin" />
-          )}
           {isPending ? 'Salvando...' : (initialHomeScore != null ? 'Atualizar palpite' : 'Salvar palpite')}
-        </button>
+        </Button>
 
         {feedback?.type === 'success' && (
           <p className="text-center font-inter text-[12px] text-accent mt-[10px]">
@@ -138,7 +140,7 @@ export default function PredictionForm({
           </p>
         )}
 
-        <div className="text-center font-inter text-[11px] text-[rgba(255,255,255,.35)] mt-[12px]">
+        <div className="text-center font-inter text-[11px] text-white/35 mt-[12px]">
           Vale o placar do tempo normal. Você pode editar até o apito inicial.
         </div>
       </form>

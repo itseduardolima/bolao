@@ -1,9 +1,32 @@
+import { cache } from 'react'
 import { randomBytes } from 'crypto'
 import { prisma } from '@/lib/prisma'
-import { INVITE_ALPHABET, INVITE_CODE_LENGTH, GROUP_ROLE } from '@/lib/group-constants'
+import {
+  INVITE_ALPHABET,
+  INVITE_CODE_LENGTH,
+  GROUP_ROLE,
+  normalizeInviteCode,
+} from '@/lib/group-constants'
 
 // Reexporta as constantes/validadores puros para uso server-side conveniente.
 export * from '@/lib/group-constants'
+
+/**
+ * Resumo leve de um grupo a partir do código de convite — usado por
+ * `generateMetadata` e pela imagem de Open Graph da página de convite.
+ * `cache` deduplica a query dentro de um mesmo render. Retorna `null` se o
+ * código for inválido ou não existir.
+ */
+export const getInviteGroupPreview = cache(async (rawCode: string) => {
+  const code = normalizeInviteCode(rawCode)
+  if (!code) return null
+  const group = await prisma.group.findUnique({
+    where: { inviteCode: code },
+    select: { name: true, _count: { select: { members: true } } },
+  })
+  if (!group) return null
+  return { name: group.name, memberCount: group._count.members }
+})
 
 /**
  * Gera um código de convite aleatório e uniforme (rejection sampling para

@@ -15,9 +15,22 @@ export default auth((req) => {
   // — o usuário precisa poder ler a política/termos que está aceitando.
   const isLegalPath = path === '/privacidade' || path === '/termos'
 
+  // Rotas de metadata do Next (imagem OG/Twitter, sitemap, robots, ícones,
+  // manifest) são buscadas por crawlers NÃO autenticados (WhatsApp, Google,
+  // Twitter) — precisam ser públicas, senão o preview de link some.
+  const isMetadataRoute =
+    path.endsWith('/opengraph-image') ||
+    path.endsWith('/twitter-image') ||
+    path === '/sitemap.xml' ||
+    path === '/robots.txt' ||
+    path === '/manifest.webmanifest' ||
+    path.startsWith('/icon') ||
+    path.startsWith('/apple-icon')
+
   const isPublicPath =
     path === '/' ||
     isLegalPath ||
+    isMetadataRoute ||
     path.startsWith('/jogos') || // lista e detalhe de jogo: visíveis deslogado
     path === '/pontuacao' ||
     path.startsWith('/grupos/entrar') || // landing de convite: visível deslogado

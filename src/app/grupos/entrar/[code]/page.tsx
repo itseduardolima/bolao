@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -5,11 +6,38 @@ import { auth } from '@/lib/auth'
 import LogoCopa from '@/assets/images/logo-copa.png'
 import { prisma } from '@/lib/prisma'
 import { normalizeInviteCode } from '@/lib/group-constants'
+import { getInviteGroupPreview } from '@/lib/groups'
 import MemberStack from '@/components/group/MemberStack'
 import JoinGroupButton from '@/components/group/JoinGroupButton'
 import SignInToJoinButton from '@/components/group/SignInToJoinButton'
 
 export const dynamic = 'force-dynamic'
+
+// Convites não devem ser indexados (são privados por código), mas precisam de
+// preview rico de Open Graph — é o que converte o link colado no WhatsApp.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ code: string }>
+}): Promise<Metadata> {
+  const { code } = await params
+  const group = await getInviteGroupPreview(code)
+
+  if (!group) {
+    return { title: 'Convite', robots: { index: false, follow: false } }
+  }
+
+  const title = `Entre na liga ${group.name}`
+  const description = `Você foi convidado para a liga "${group.name}" no Bolão Copa do Mundo 2026. Dê seus palpites e dispute o ranking com os amigos.`
+
+  return {
+    title,
+    description,
+    robots: { index: false, follow: false },
+    openGraph: { title: `${title} · Bolão Copa 2026`, description },
+    twitter: { title: `${title} · Bolão Copa 2026`, description },
+  }
+}
 
 function InvalidInvite() {
   return (

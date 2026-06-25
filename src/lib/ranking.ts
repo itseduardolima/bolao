@@ -71,13 +71,18 @@ export async function getGroupRanking(groupId: string): Promise<RankingEntry[]> 
       u.id,
       u.nickname,
       u.image,
-      COALESCE(SUM(p.points), 0) AS totalPoints,
-      COUNT(CASE WHEN p.points = 3 THEN 1 END) AS exactHits,
-      COUNT(CASE WHEN p.points = 1 THEN 1 END) AS winnerHits,
-      COUNT(p.id) AS gamesPlayed
+      COALESCE(SUM(ep.points), 0) AS totalPoints,
+      COUNT(CASE WHEN ep.points = 3 THEN 1 END) AS exactHits,
+      COUNT(CASE WHEN ep.points = 1 THEN 1 END) AS winnerHits,
+      COUNT(ep.id) AS gamesPlayed
     FROM GroupMember gm
-    JOIN User u ON u.id = gm.userId
-    LEFT JOIN Prediction p ON p.userId = u.id
+    JOIN User u      ON u.id = gm.userId
+    JOIN "Group" grp ON grp.id = gm.groupId
+    LEFT JOIN (
+      SELECT p.id, p.userId, p.points, g.startsAt
+      FROM Prediction p
+      JOIN Game g ON g.id = p.gameId
+    ) ep ON ep.userId = u.id AND ep.startsAt >= grp.createdAt
     WHERE gm.groupId = ${groupId}
     GROUP BY u.id, u.nickname, u.image
     ORDER BY

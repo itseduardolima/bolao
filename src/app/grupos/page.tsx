@@ -9,6 +9,11 @@ import MemberStack from '@/components/group/MemberStack'
 
 export const dynamic = 'force-dynamic'
 
+// Página privada (requer login) — fora do índice de busca.
+export const metadata = {
+  robots: { index: false, follow: false },
+}
+
 export default async function GruposPage() {
   const session = await auth()
   if (!session?.user?.id) redirect('/?login=1')

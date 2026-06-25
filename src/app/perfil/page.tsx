@@ -14,6 +14,11 @@ import type { GameStatus } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
+// Página privada (requer login) — fora do índice de busca.
+export const metadata = {
+  robots: { index: false, follow: false },
+}
+
 type GameRow = {
   id: string
   homeTeam: string

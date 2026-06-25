@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Container from '@/components/layout/Container'
@@ -8,6 +9,15 @@ import LiveRefresh from '@/components/game/LiveRefresh'
 import type { GameStatus } from '@/types'
 
 export const dynamic = 'force-dynamic'
+
+// Canonical fixo: a página recebe `?date=` para navegar entre dias, mas todas
+// as variações consolidam em /jogos para o índice.
+export const metadata: Metadata = {
+  title: 'Jogos da Copa do Mundo 2026',
+  description:
+    'Tabela de jogos da Copa do Mundo 2026: datas, horários, resultados ao vivo e seus palpites.',
+  alternates: { canonical: '/jogos' },
+}
 
 function toLocalDate(date: Date): string {
   return new Intl.DateTimeFormat('en-CA', {

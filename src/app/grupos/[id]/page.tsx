@@ -13,6 +13,11 @@ import RemoveMemberButton from '@/components/group/RemoveMemberButton'
 
 export const dynamic = 'force-dynamic'
 
+// Página privada (requer login) — fora do índice de busca.
+export const metadata = {
+  robots: { index: false, follow: false },
+}
+
 export default async function GroupDetailPage({
   params,
 }: {

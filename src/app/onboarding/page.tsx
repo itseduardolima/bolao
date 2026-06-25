@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import Spinner from '@/components/ui/Spinner'
 import Button from '@/components/ui/Button'
@@ -105,6 +106,28 @@ export default function OnboardingPage() {
           >
             {isSaving ? 'Salvando…' : 'Confirmar apelido'}
           </Button>
+
+          <p className="font-inter text-[12px] leading-[1.6] text-white/[42%] text-center mt-[16px]">
+            Ao confirmar, você concorda com os{' '}
+            <Link
+              href="/termos"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/[60%] font-medium underline underline-offset-2 hover:text-primary"
+            >
+              Termos de Uso
+            </Link>{' '}
+            e a{' '}
+            <Link
+              href="/privacidade"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/[60%] font-medium underline underline-offset-2 hover:text-primary"
+            >
+              Política de Privacidade
+            </Link>
+            . Seu apelido será público no ranking e nas ligas.
+          </p>
         </form>
       </div>
     </main>

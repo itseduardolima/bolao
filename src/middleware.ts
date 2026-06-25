@@ -11,8 +11,13 @@ export default auth((req) => {
   const isAuthenticated = !!session?.user
   const hasNickname = session?.user?.hasNickname ?? false
 
+  // Páginas legais (LGPD): devem ser acessíveis deslogado E durante o onboarding
+  // — o usuário precisa poder ler a política/termos que está aceitando.
+  const isLegalPath = path === '/privacidade' || path === '/termos'
+
   const isPublicPath =
     path === '/' ||
+    isLegalPath ||
     path.startsWith('/jogos') || // lista e detalhe de jogo: visíveis deslogado
     path === '/pontuacao' ||
     path.startsWith('/grupos/entrar') || // landing de convite: visível deslogado
@@ -35,7 +40,7 @@ export default auth((req) => {
 
   // Regra 2: autenticado sem nickname → forçar onboarding, preservando o
   // destino original (ex.: link de convite) via callbackUrl interno.
-  if (isAuthenticated && !hasNickname && path !== '/onboarding' && !isApiPath) {
+  if (isAuthenticated && !hasNickname && path !== '/onboarding' && !isApiPath && !isLegalPath) {
     const onboardingUrl = new URL('/onboarding', req.url)
     onboardingUrl.searchParams.set('callbackUrl', path + req.nextUrl.search)
     return NextResponse.redirect(onboardingUrl)

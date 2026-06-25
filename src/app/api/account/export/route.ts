@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 
 // Export dos dados pessoais do usuário autenticado (LGPD art. 18 — acesso e
 // portabilidade). Devolve um JSON legível para download. A autorização é feita
-// aqui (o ator vem da sessão); a rota está liberada no middleware apenas para
+// aqui (o ator vem da sessão); a rota está liberada no proxy apenas para
 // que chamadas não autenticadas recebam 401 limpo em vez de redirect.
 export async function GET() {
   const session = await auth()

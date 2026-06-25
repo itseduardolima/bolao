@@ -1,3 +1,6 @@
+// Proxy (antigo `middleware`, renomeado no Next 16) — auth-gating de rotas.
+// Roda no runtime Node.js por padrão. Server actions (POST) NÃO passam por aqui:
+// cada action revalida `auth()` por conta própria.
 import NextAuth from 'next-auth'
 import { NextResponse } from 'next/server'
 import { authConfig } from '@/lib/auth.config'

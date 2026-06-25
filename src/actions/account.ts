@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 // ─────────────────────────────────────────────────────────────────────────
 // IMPORTANTE (segurança): server actions são POSTs que NÃO passam pelo redirect
-// do middleware. O ator é SEMPRE derivado da sessão (auth()) — nunca de um id
+// do proxy. O ator é SEMPRE derivado da sessão (auth()) — nunca de um id
 // vindo do cliente. A limpeza do cookie de sessão é feita no client (signOut do
 // next-auth/react) após o sucesso, seguindo a convenção do projeto.
 // ─────────────────────────────────────────────────────────────────────────

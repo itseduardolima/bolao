@@ -5,7 +5,7 @@ import { signIn } from 'next-auth/react'
 import { X } from '@phosphor-icons/react'
 import Button from '@/components/ui/Button'
 
-// Modal de login disparado pelo middleware ao mandar um deslogado para `/?login=1`.
+// Modal de login disparado pelo proxy ao mandar um deslogado para `/?login=1`.
 // O `from` carrega o destino pretendido (ex.: /grupos), para onde o usuário volta
 // assim que autentica.
 export default function LoginPrompt() {

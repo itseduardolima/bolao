@@ -19,7 +19,7 @@ import {
 
 // ─────────────────────────────────────────────────────────────────────────
 // IMPORTANTE (segurança): server actions são POSTs que NÃO passam pelas regras
-// de redirect do middleware. Por isso cada action revalida `auth()` e deriva o
+// de redirect do proxy. Por isso cada action revalida `auth()` e deriva o
 // ator SEMPRE da sessão — nunca confia em id de usuário vindo do cliente.
 // Toda autorização é feita no servidor; mutações de dono usam guardas atômicas
 // (deleteMany/updateMany com filtro de ownerId) para evitar TOCTOU.

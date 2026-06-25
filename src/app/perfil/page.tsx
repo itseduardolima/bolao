@@ -4,6 +4,11 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Container from '@/components/layout/Container'
 import Avatar from '@/components/ui/Avatar'
+import Card from '@/components/ui/Card'
+import Eyebrow from '@/components/ui/Eyebrow'
+import StatCard from '@/components/ui/StatCard'
+import PointsBadge from '@/components/ui/PointsBadge'
+import { cn } from '@/lib/utils'
 import type { GameStatus } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -26,32 +31,26 @@ type PredictionRow = {
   points: number | null
 }
 
-function PointsBadge({ points }: { points: number }) {
-  if (points === 3) return <span className="font-barlow text-[12px] font-bold text-accent bg-[rgba(0,255,135,.12)] rounded-[6px] px-[10px] py-[3px]">+3</span>
-  if (points === 1) return <span className="font-barlow text-[12px] font-bold text-warning bg-[rgba(245,158,11,.14)] rounded-[6px] px-[10px] py-[3px]">+1</span>
-  return <span className="font-barlow text-[12px] font-bold text-[rgba(255,255,255,.5)] bg-[rgba(255,255,255,.07)] rounded-[6px] px-[10px] py-[3px]">0</span>
-}
-
 function PhaseSection({ phase, rows, predMap }: { phase: string; rows: GameRow[]; predMap: Map<string, PredictionRow> }) {
   const phasePreds = rows.map(r => predMap.get(r.id)).filter(Boolean)
   const phasePts = phasePreds.reduce((s, p) => s + (p!.points ?? 0), 0)
   const meta = `${phasePreds.length} palpites · ${phasePts} pts`
 
   return (
-    <div className="bg-surface border border-border rounded-[14px] overflow-hidden">
+    <Card className="rounded-[14px] overflow-hidden">
       <div className="flex items-center justify-between px-[20px] py-[16px]">
         <div className="flex items-baseline gap-[12px]">
           <span className="font-barlow text-[17px] font-bold text-primary">{phase}</span>
-          <span className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)]">{meta}</span>
+          <span className="font-inter text-[12px] font-medium text-white/[42%]">{meta}</span>
         </div>
       </div>
 
-      <div className="grid [grid-template-columns:1fr_90px_90px_80px] gap-[10px] px-[20px] py-[8px] font-[Barlow_Condensed] text-[10px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase border-t border-[rgba(255,255,255,.06)]">
+      <Eyebrow className="grid [grid-template-columns:1fr_90px_90px_80px] gap-[10px] px-[20px] py-[8px] text-[10px] tracking-[.14em] border-t border-white/[6%]">
         <span>Jogo</span>
         <span className="text-center">Resultado</span>
         <span className="text-center">Palpite</span>
         <span className="text-right">Pts</span>
-      </div>
+      </Eyebrow>
 
       {rows.map((game) => {
         const pred = predMap.get(game.id)
@@ -62,32 +61,31 @@ function PhaseSection({ phase, rows, predMap }: { phase: string; rows: GameRow[]
         const realDisplay = hasResult && game.homeScore !== null && game.awayScore !== null
           ? `${game.homeScore} - ${game.awayScore}`
           : '—'
-        const realColor = hasResult ? '#fff' : 'rgba(255,255,255,.3)'
         const guessDisplay = pred ? `${pred.homeScore} - ${pred.awayScore}` : '—'
 
         return (
-          <div key={game.id} className="grid [grid-template-columns:1fr_90px_90px_80px] gap-[10px] px-[20px] py-[12px] items-center border-t border-[rgba(255,255,255,.05)]">
+          <div key={game.id} className="grid [grid-template-columns:1fr_90px_90px_80px] gap-[10px] px-[20px] py-[12px] items-center border-t border-white/[5%]">
             <div className="flex items-center gap-[9px]">
               <span className="font-barlow text-[14px] font-semibold text-primary">
                 {game.homeTeam.slice(0, 3).toUpperCase()} × {game.awayTeam.slice(0, 3).toUpperCase()}
               </span>
               {isLive && (
-                <span className="inline-flex items-center gap-[4px] font-[Barlow_Condensed] text-[8px] font-semibold tracking-[.1em] text-accent bg-[rgba(0,255,135,.12)] rounded-[4px] px-[6px] py-[2px] uppercase">
+                <span className="inline-flex items-center gap-[4px] font-barlow text-[8px] font-semibold tracking-[.1em] text-accent bg-accent/[12%] rounded-[4px] px-[6px] py-[2px] uppercase">
                   ● Ao vivo
                 </span>
               )}
             </div>
-            <span className="text-center font-barlow text-[14px] font-semibold" style={{ color: realColor }}>
+            <span className={cn('text-center font-barlow text-[14px] font-semibold', hasResult ? 'text-white' : 'text-white/30')}>
               {realDisplay}
             </span>
-            <span className="text-center font-barlow text-[14px] font-semibold text-[rgba(255,255,255,.7)]">
+            <span className="text-center font-barlow text-[14px] font-semibold text-white/70">
               {guessDisplay}
             </span>
             <div className="flex justify-end">
               {pred && pred.points !== null ? (
                 <PointsBadge points={pred.points} />
               ) : pred && !hasResult ? (
-                <span className="font-inter text-[12px] text-[rgba(255,255,255,.42)]">—</span>
+                <span className="font-inter text-[12px] text-white/[42%]">—</span>
               ) : !pred ? (
                 <Link href={`/jogos/${game.id}`} className="font-inter text-[12px] font-bold text-accent">Palpitar</Link>
               ) : null}
@@ -95,7 +93,7 @@ function PhaseSection({ phase, rows, predMap }: { phase: string; rows: GameRow[]
           </div>
         )
       })}
-    </div>
+    </Card>
   )
 }
 
@@ -154,9 +152,7 @@ export default async function PerfilPage() {
       <div className="flex items-center gap-[14px]">
         <Avatar src={session.user.image ?? null} name={session.user.nickname ?? session.user.name ?? 'U'} size={54} />
         <div>
-          <div className="font-[Barlow_Condensed] text-[12px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
-            Meus palpites
-          </div>
+          <Eyebrow className="text-[12px] tracking-[.22em]">Meus palpites</Eyebrow>
           <h1 className="font-barlow text-[32px] font-extrabold text-primary mt-[3px] leading-none">
             {session.user.nickname ?? session.user.name ?? 'Você'}
           </h1>
@@ -164,22 +160,10 @@ export default async function PerfilPage() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-[14px] mt-[26px]">
-        <div className="bg-surface border border-border rounded-[14px] p-[20px]">
-          <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase">Pontos</div>
-          <div className="font-barlow text-[34px] font-extrabold text-accent mt-[10px] leading-none">{totalPoints}</div>
-        </div>
-        <div className="bg-surface border border-border rounded-[14px] p-[20px]">
-          <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase">Acertos exatos</div>
-          <div className="font-barlow text-[34px] font-extrabold text-primary mt-[10px] leading-none">{exactHits}</div>
-        </div>
-        <div className="bg-surface border border-border rounded-[14px] p-[20px]">
-          <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase">Acertos de vencedor</div>
-          <div className="font-barlow text-[34px] font-extrabold text-primary mt-[10px] leading-none">{winnerHits}</div>
-        </div>
-        <div className="bg-surface border border-border rounded-[14px] p-[20px]">
-          <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.14em] text-[rgba(255,255,255,.42)] uppercase">Jogos palpitados</div>
-          <div className="font-barlow text-[34px] font-extrabold text-primary mt-[10px] leading-none">{gamesPlayed}</div>
-        </div>
+        <StatCard label="Pontos" value={totalPoints} tone="accent" />
+        <StatCard label="Acertos exatos" value={exactHits} />
+        <StatCard label="Acertos de vencedor" value={winnerHits} />
+        <StatCard label="Jogos palpitados" value={gamesPlayed} />
       </div>
 
       <div className="mt-[26px] flex flex-col gap-[12px]">

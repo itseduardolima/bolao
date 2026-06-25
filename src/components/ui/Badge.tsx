@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import type { GameStatus } from '@/types'
 
-type BadgeVariant = GameStatus | 'points-exact' | 'points-winner' | 'points-miss'
+type BadgeVariant = GameStatus
 
 type BadgeProps = {
   variant: BadgeVariant
@@ -14,9 +14,6 @@ const variantStyles: Record<BadgeVariant, string> = {
   LIVE: 'bg-accent-dim text-accent border border-accent-border animate-pulse-live',
   PAUSED: 'bg-warning-dim text-warning border border-warning-border',
   FINISHED: 'bg-finished-dim text-finished',
-  'points-exact': 'bg-accent-dim text-accent border border-accent-border',
-  'points-winner': 'bg-warning-dim text-warning border border-warning-border',
-  'points-miss': 'bg-elevated text-secondary',
 }
 
 const statusLabels: Partial<Record<BadgeVariant, string>> = {

@@ -54,27 +54,20 @@ export default function GroupActions({ groupId, isOwner }: GroupActionsProps) {
     })
   }
 
+  const label = isOwner
+    ? (isPending ? 'Excluindo...' : 'Excluir grupo')
+    : (isPending ? 'Saindo...' : 'Sair do grupo')
+
   return (
     <div className="flex justify-end">
-      {isOwner ? (
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={isPending}
-          className="bg-transparent border border-error/40 text-error px-[18px] py-[10px] rounded-[10px] font-inter text-[13px] font-semibold cursor-pointer transition-colors hover:bg-error/10 disabled:opacity-50"
-        >
-          {isPending ? 'Excluindo...' : 'Excluir grupo'}
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={handleLeave}
-          disabled={isPending}
-          className="bg-transparent border border-error/40 text-error px-[18px] py-[10px] rounded-[10px] font-inter text-[13px] font-semibold cursor-pointer transition-colors hover:bg-error/10 disabled:opacity-50"
-        >
-          {isPending ? 'Saindo...' : 'Sair do grupo'}
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={isOwner ? handleDelete : handleLeave}
+        disabled={isPending}
+        className="bg-transparent border border-error/40 text-error px-[18px] py-[10px] rounded-[10px] font-inter text-[13px] font-semibold cursor-pointer transition-colors hover:bg-error/10 disabled:opacity-50"
+      >
+        {label}
+      </button>
       {error && <p className="font-inter text-sm text-error">{error}</p>}
     </div>
   )

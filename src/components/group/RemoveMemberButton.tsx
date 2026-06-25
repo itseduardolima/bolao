@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { removeMember } from '@/actions/groups'
 import { useConfirm } from '@/components/ui/ConfirmDialog'
+import Spinner from '@/components/ui/Spinner'
 
 type RemoveMemberButtonProps = {
   groupId: string
@@ -49,7 +50,7 @@ export default function RemoveMemberButton({
     >
       {isPending ? (
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block w-[13px] h-[13px] rounded-full border-2 border-white/20 border-t-error animate-spin" />
+          <Spinner tone="error" className="h-[13px] w-[13px]" />
           Removendo
         </span>
       ) : (

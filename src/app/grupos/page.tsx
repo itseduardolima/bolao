@@ -94,8 +94,8 @@ export default async function GruposPage() {
 
               {/* avatars + member count */}
               <div className="flex items-center gap-[10px] mt-[14px]">
-                <MemberStack members={g.top} total={g.memberCount} size={26} borderColor="#16162a" />
-                <span className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)]">
+                <MemberStack members={g.top} total={g.memberCount} size={26} borderTone="surface" />
+                <span className="font-inter text-[12px] font-medium text-white/[42%]">
                   {g.memberCount} {g.memberCount === 1 ? 'membro' : 'membros'}
                 </span>
               </div>

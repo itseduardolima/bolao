@@ -6,6 +6,8 @@ import { CaretDown, CaretUp } from '@phosphor-icons/react'
 import { regenerateInviteCode } from '@/actions/groups'
 import { buildInvitePath } from '@/lib/group-constants'
 import { useConfirm } from '@/components/ui/ConfirmDialog'
+import Eyebrow from '@/components/ui/Eyebrow'
+import Spinner from '@/components/ui/Spinner'
 
 type InviteLinkProps = {
   groupId: string
@@ -63,12 +65,10 @@ export default function InviteLink({ groupId, code: initialCode, isOwner }: Invi
         onClick={() => setOpen((v) => !v)}
         className={`w-full bg-surface border border-border px-5 py-3 flex items-center justify-between gap-3 hover:border-white/20 transition-colors ${open ? 'rounded-t-xl' : 'rounded-xl'}`}
       >
-        <span className="font-barlow text-[11px] font-semibold uppercase tracking-[.2em] text-[rgba(255,255,255,.42)]">
-          Código de convite
-        </span>
+        <Eyebrow>Código de convite</Eyebrow>
         {open
-          ? <CaretUp size={14} weight="bold" className="text-[rgba(255,255,255,.35)]" />
-          : <CaretDown size={14} weight="bold" className="text-[rgba(255,255,255,.35)]" />
+          ? <CaretUp size={14} weight="bold" className="text-white/35" />
+          : <CaretDown size={14} weight="bold" className="text-white/35" />
         }
       </button>
 
@@ -79,7 +79,7 @@ export default function InviteLink({ groupId, code: initialCode, isOwner }: Invi
             <div className="font-barlow text-[34px] font-black leading-none tracking-[.16em] text-accent">
               {code}
             </div>
-            <div className="font-mono text-[12px] text-[rgba(255,255,255,.27)] mt-2">
+            <div className="font-mono text-[12px] text-white/[27%] mt-2">
               {path}
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function InviteLink({ groupId, code: initialCode, isOwner }: Invi
               >
                 {isPending ? (
                   <>
-                    <span className="inline-block w-3 h-3 rounded-full border-2 border-white/20 border-t-error animate-spin" />
+                    <Spinner tone="error" className="h-3 w-3" />
                     {' '}Gerando…
                   </>
                 ) : (

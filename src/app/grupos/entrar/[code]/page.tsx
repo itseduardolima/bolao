@@ -95,7 +95,7 @@ export default async function JoinInvitePage({
       {/* avatar stack + count */}
       <div className="flex items-center justify-center gap-[10px] mt-[18px]">
         {previews.length > 0 && (
-          <MemberStack members={previews} total={memberCount} size={30} borderColor="#0f0f1a" />
+          <MemberStack members={previews} total={memberCount} size={30} borderTone="base" />
         )}
         <span className="font-inter text-[13px] font-medium text-secondary/70">
           {memberCount} {memberCount === 1 ? 'amigo competindo' : 'amigos já estão competindo'}

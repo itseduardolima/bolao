@@ -1,9 +1,8 @@
 import { cn } from '@/lib/utils'
 
 type SpinnerProps = {
-  // 'light' = anel branco sobre fundo escuro; 'dark' = anel preto sobre o accent;
-  // 'accent' = anel verde sobre fundo escuro.
-  tone?: 'light' | 'dark' | 'accent'
+  // light = branco; dark = preto (sobre accent); accent = verde; error = vermelho.
+  tone?: 'light' | 'dark' | 'accent' | 'error'
   className?: string
 }
 
@@ -11,6 +10,7 @@ const toneStyles: Record<NonNullable<SpinnerProps['tone']>, string> = {
   light: 'border-white/20 border-t-white',
   dark: 'border-black/30 border-t-black',
   accent: 'border-accent/30 border-t-accent',
+  error: 'border-white/20 border-t-error',
 }
 
 export default function Spinner({ tone = 'dark', className }: SpinnerProps) {

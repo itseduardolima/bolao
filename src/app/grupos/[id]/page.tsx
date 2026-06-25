@@ -90,12 +90,12 @@ export default async function GroupDetailPage({
       {/* Breadcrumb */}
       <Link
         href="/grupos"
-        className="inline-flex items-center gap-[7px] font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)] hover:text-secondary transition-colors"
+        className="inline-flex items-center gap-[7px] font-inter text-[12px] font-medium text-white/[42%] hover:text-secondary transition-colors"
       >
         <span className="inline-block w-[7px] h-[7px] border-l-2 border-b-2 border-current rotate-45" />
         Ligas
-        <span className="text-[rgba(255,255,255,.27)]">/</span>
-        <span className="text-[rgba(255,255,255,.67)]">{group.name}</span>
+        <span className="text-white/[27%]">/</span>
+        <span className="text-white/[67%]">{group.name}</span>
       </Link>
 
       {/* Header */}
@@ -111,7 +111,7 @@ export default async function GroupDetailPage({
               </span>
             )}
           </div>
-          <div className="font-inter text-[14px] text-[rgba(255,255,255,.67)] mt-2">
+          <div className="font-inter text-[14px] text-white/[67%] mt-2">
             {memberCount} {memberCount === 1 ? 'membro' : 'membros'}
             {leader && (
               <> · liderado por <span className="text-primary font-semibold">{leader}</span></>

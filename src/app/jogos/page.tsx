@@ -88,7 +88,7 @@ export default async function JogosPage({
       <Container>
         <div className="flex items-end justify-between gap-4 mb-[22px]">
           <div>
-            <div className="font-[Barlow_Condensed] text-[12px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
+            <div className="font-barlow text-[12px] font-semibold uppercase tracking-[.22em] text-white/[42%]">
               Copa do Mundo 2026
             </div>
             <h1 className="font-barlow text-[38px] font-extrabold text-primary mt-[6px]">

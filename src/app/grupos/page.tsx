@@ -42,13 +42,13 @@ export default async function GruposPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-8 py-9">
       {/* Header */}
-      <div className="font-barlow text-[12px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
+      <div className="font-barlow text-[12px] font-semibold uppercase tracking-[.22em] text-white/[42%]">
         Suas ligas
       </div>
       <h1 className="font-barlow text-[38px] font-black uppercase text-primary leading-none mt-[6px]">
         Ligas
       </h1>
-      <p className="font-inter text-[14px] leading-relaxed text-[rgba(255,255,255,.67)] max-w-[560px] mt-[10px]">
+      <p className="font-inter text-[14px] leading-relaxed text-white/[67%] max-w-[560px] mt-[10px]">
         Rankings privados entre amigos, só por convite. Seu palpite no bolão geral vale automaticamente em todas as ligas — elas são lentes do mesmo jogo, não palpites separados.
       </p>
 
@@ -59,7 +59,7 @@ export default async function GruposPage() {
       </div>
 
       {/* Cards section title */}
-      <h3 className="mt-[26px] mb-[14px] font-barlow text-[11px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
+      <h3 className="mt-[26px] mb-[14px] font-barlow text-[11px] font-semibold uppercase tracking-[.22em] text-white/[42%]">
         {cards.length > 0 && `${cards.length} ${cards.length === 1 ? 'liga' : 'ligas'}`}
       </h3>
 
@@ -68,7 +68,7 @@ export default async function GruposPage() {
           <div className="font-barlow text-[26px] font-bold uppercase text-primary">
             Você ainda não está em nenhuma liga
           </div>
-          <p className="font-inter text-[14px] leading-relaxed text-[rgba(255,255,255,.67)] max-w-[440px] mx-auto mt-3">
+          <p className="font-inter text-[14px] leading-relaxed text-white/[67%] max-w-[440px] mx-auto mt-3">
             Crie uma liga e convide a galera, ou entre numa existente com um código de convite. Seu palpite no bolão geral já conta automaticamente.
           </p>
         </div>
@@ -103,16 +103,16 @@ export default async function GruposPage() {
               {/* footer: position + points */}
               <div className="flex items-end justify-between mt-[16px] pt-[14px] border-t border-white/[.06]">
                 <div>
-                  <div className="font-barlow text-[10px] font-medium uppercase tracking-[.16em] text-[rgba(255,255,255,.42)]">
+                  <div className="font-barlow text-[10px] font-medium uppercase tracking-[.16em] text-white/[42%]">
                     Sua posição
                   </div>
                   <div className="font-barlow text-[24px] font-black leading-none text-primary mt-[2px]">
                     {g.myRank ? `${g.myRank}º` : '—'}
-                    <span className="font-medium text-[14px] text-[rgba(255,255,255,.42)]"> de {g.memberCount}</span>
+                    <span className="font-medium text-[14px] text-white/[42%]"> de {g.memberCount}</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-barlow text-[10px] font-medium uppercase tracking-[.16em] text-[rgba(255,255,255,.42)]">
+                  <div className="font-barlow text-[10px] font-medium uppercase tracking-[.16em] text-white/[42%]">
                     Pontos
                   </div>
                   <div className="font-barlow text-[24px] font-black leading-none text-primary mt-[2px]">

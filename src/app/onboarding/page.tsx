@@ -45,7 +45,7 @@ export default function OnboardingPage() {
         <h1 className="font-barlow text-[34px] font-extrabold text-primary leading-[1.05] text-center">
           Escolha seu apelido
         </h1>
-        <p className="font-inter text-[14px] leading-[1.6] text-[rgba(255,255,255,.55)] text-center mt-[10px]">
+        <p className="font-inter text-[14px] leading-[1.6] text-white/[55%] text-center mt-[10px]">
           É como você vai aparecer no ranking e nas ligas. Escolha com carinho — não dá para mudar depois.
         </p>
 
@@ -72,13 +72,13 @@ export default function OnboardingPage() {
             )}
 
             {status === 'available' && (
-              <span className="absolute right-[14px] top-[16px] w-[22px] h-[22px] rounded-full bg-[rgba(0,255,135,.15)] text-accent flex items-center justify-center font-inter text-[12px] font-bold">
+              <span className="absolute right-[14px] top-[16px] w-[22px] h-[22px] rounded-full bg-accent/15 text-accent flex items-center justify-center font-inter text-[12px] font-bold">
                 ✓
               </span>
             )}
 
             {(status === 'unavailable' || status === 'invalid') && (
-              <span className="absolute right-[14px] top-[16px] w-[22px] h-[22px] rounded-full bg-[rgba(239,68,68,.15)] text-error flex items-center justify-center font-inter text-[12px] font-bold">
+              <span className="absolute right-[14px] top-[16px] w-[22px] h-[22px] rounded-full bg-[#ef4444]/15 text-error flex items-center justify-center font-inter text-[12px] font-bold">
                 ✕
               </span>
             )}

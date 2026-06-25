@@ -7,7 +7,7 @@ type PointsBadgeProps = {
 
 const toneByPoints: Record<number, string> = {
   3: 'text-accent bg-accent/[12%]',
-  1: 'text-warning bg-[rgba(245,158,11,.14)]',
+  1: 'text-warning bg-[#f59e0b]/[14%]',
   0: 'text-white/50 bg-white/[7%]',
 }
 

@@ -67,7 +67,7 @@ export default async function GameDetailPage({
       <Container className="max-w-2xl">
         <Link
           href={`/jogos?date=${gameDate}`}
-          className="inline-flex items-center gap-[7px] font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)] hover:text-secondary transition-colors"
+          className="inline-flex items-center gap-[7px] font-inter text-[12px] font-medium text-white/[42%] hover:text-secondary transition-colors"
         >
           <span className="inline-block w-[7px] h-[7px] border-l-2 border-b-2 border-current rotate-45" />
           Jogos
@@ -91,7 +91,7 @@ export default async function GameDetailPage({
 
           {canPredict && (
             <div className="bg-surface border border-border rounded-[16px] p-[24px_28px] mt-[14px]">
-              <div className="font-[Barlow_Condensed] text-[11px] font-semibold tracking-[.2em] text-[rgba(255,255,255,.42)] uppercase">
+              <div className="font-barlow text-[11px] font-semibold tracking-[.2em] text-white/[42%] uppercase">
                 Seu palpite
               </div>
               <PredictionForm

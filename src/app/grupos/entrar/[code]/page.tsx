@@ -85,7 +85,7 @@ export default async function JoinInvitePage({
         </span>
       </div>
       {/* eyebrow */}
-      <div className="font-barlow text-[12px] font-semibold uppercase tracking-[.22em] text-[rgba(255,255,255,.42)]">
+      <div className="font-barlow text-[12px] font-semibold uppercase tracking-[.22em] text-white/[42%]">
         Você foi convidado para
       </div>
       {/* group name */}
@@ -106,14 +106,14 @@ export default async function JoinInvitePage({
         {!user ? (
           <>
             <SignInToJoinButton code={code} />
-            <p className="font-inter text-[12px] text-[rgba(255,255,255,.42)] mt-[14px]">
+            <p className="font-inter text-[12px] text-white/[42%] mt-[14px]">
               Você volta para esta liga assim que entrar.
             </p>
           </>
         ) : user.hasNickname ? (
           <>
             <JoinGroupButton code={code} />
-            <p className="font-inter text-[12px] text-[rgba(255,255,255,.42)] mt-[14px]">
+            <p className="font-inter text-[12px] text-white/[42%] mt-[14px]">
               Entrando como <span className="text-primary font-semibold">{user.name ?? 'você'}</span>.
             </p>
           </>
@@ -125,14 +125,14 @@ export default async function JoinInvitePage({
             >
               Escolher apelido para participar
             </Link>
-            <p className="font-inter text-[12px] text-[rgba(255,255,255,.42)] mt-[14px]">
+            <p className="font-inter text-[12px] text-white/[42%] mt-[14px]">
               Escolha um apelido para aparecer no ranking.
             </p>
           </>
         )}
       </div>
       {/* fine print */}
-      <p className="font-inter text-[12px] text-[rgba(255,255,255,.42)] max-w-[420px] mt-8">
+      <p className="font-inter text-[12px] text-white/[42%] max-w-[420px] mt-8">
         Entrando, você passa a disputar o ranking desta liga. Seus palpites continuam os mesmos do bolão geral.
       </p>
     </div>

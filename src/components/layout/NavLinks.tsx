@@ -26,7 +26,7 @@ export default function NavLinks() {
               'font-inter text-[13px] font-semibold',
               active
                 ? 'text-primary font-semibold'
-                : 'text-[rgba(255,255,255,.55)] font-semibold hover:text-primary',
+                : 'text-white/[55%] font-semibold hover:text-primary',
             )}
           >
             {label}

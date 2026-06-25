@@ -57,6 +57,9 @@ function PhaseSection({ phase, rows, predMap }: { phase: string; rows: GameRow[]
         const isLive = game.status === 'LIVE' || game.status === 'PAUSED'
         const isFinished = game.status === 'FINISHED'
         const hasResult = isFinished || isLive
+        // Só dá pra palpitar em jogo agendado e antes do apito (mesmo gatilho da
+        // página do jogo). Jogos passados sem palpite mostram "—", não "Palpitar".
+        const canStillPredict = game.status === 'SCHEDULED' && game.startsAt > new Date()
 
         const realDisplay = hasResult && game.homeScore !== null && game.awayScore !== null
           ? `${game.homeScore} - ${game.awayScore}`
@@ -86,9 +89,11 @@ function PhaseSection({ phase, rows, predMap }: { phase: string; rows: GameRow[]
                 <PointsBadge points={pred.points} />
               ) : pred && !hasResult ? (
                 <span className="font-inter text-[12px] text-white/[42%]">—</span>
-              ) : !pred ? (
+              ) : !pred && canStillPredict ? (
                 <Link href={`/jogos/${game.id}`} className="font-inter text-[12px] font-bold text-accent">Palpitar</Link>
-              ) : null}
+              ) : (
+                <span className="font-inter text-[12px] text-white/[42%]">—</span>
+              )}
             </div>
           </div>
         )

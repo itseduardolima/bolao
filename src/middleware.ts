@@ -13,7 +13,7 @@ export default auth((req) => {
 
   const isPublicPath =
     path === '/' ||
-    path === '/jogos' ||
+    path.startsWith('/jogos') || // lista e detalhe de jogo: visíveis deslogado
     path === '/pontuacao' ||
     path.startsWith('/grupos/entrar') || // landing de convite: visível deslogado
     path.startsWith('/api/auth') ||
@@ -24,9 +24,13 @@ export default auth((req) => {
 
   const isApiPath = path.startsWith('/api/')
 
-  // Regra 1: não autenticado tentando acessar rota protegida
+  // Regra 1: não autenticado tentando acessar rota protegida → home com prompt
+  // de login, preservando o destino pretendido para voltar após autenticar.
   if (!isAuthenticated && !isPublicPath && path !== '/onboarding') {
-    return NextResponse.redirect(new URL('/?login=1', req.url))
+    const loginUrl = new URL('/', req.url)
+    loginUrl.searchParams.set('login', '1')
+    loginUrl.searchParams.set('from', path + req.nextUrl.search)
+    return NextResponse.redirect(loginUrl)
   }
 
   // Regra 2: autenticado sem nickname → forçar onboarding, preservando o

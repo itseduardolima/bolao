@@ -111,7 +111,7 @@ export default async function GameDetailPage({
                 Entre para registrar seu palpite
               </div>
               <Link
-                href="/?login=1"
+                href={`/?login=1&from=/jogos/${game.id}`}
                 className="inline-flex items-center justify-center h-[48px] px-[26px] mt-[16px] bg-accent text-black rounded-[12px] font-inter text-[14px] font-bold"
               >
                 Entrar para palpitar

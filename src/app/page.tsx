@@ -1,7 +1,9 @@
+import { Suspense } from 'react'
 import { auth } from '@/lib/auth'
 import { getGlobalRanking } from '@/lib/ranking'
 import Container from '@/components/layout/Container'
 import RankingTable from '@/components/ranking/RankingTable'
+import LoginPrompt from '@/components/auth/LoginPrompt'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,6 +12,9 @@ export default async function HomePage() {
 
   return (
     <Container>
+      <Suspense fallback={null}>
+        <LoginPrompt />
+      </Suspense>
       <div className="font-barlow text-[12px] font-semibold uppercase tracking-[.22em] text-white/[42%]">
         Bolão geral
       </div>

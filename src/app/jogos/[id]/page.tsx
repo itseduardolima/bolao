@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Container from '@/components/layout/Container'
 import GameDetailHeader from '@/components/game/GameDetailHeader'
+import KickoffRefresh from '@/components/game/KickoffRefresh'
 import PredictionForm from '@/components/prediction/PredictionForm'
 import ParticipantPredictions from '@/components/prediction/ParticipantPredictions'
 import type { GameStatus } from '@/types'
@@ -56,11 +57,11 @@ export default async function GameDetailPage({
 
   const status = game.status as GameStatus
   const gameDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Manaus' }).format(game.startsAt)
-  const showScore = status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED'
-  const canPredict =
-    !!userId &&
-    status === 'SCHEDULED' &&
-    new Date(game.startsAt) > new Date()
+  // Apito como gatilho (mesmo do flip "Ao vivo" no header): a partir de startsAt
+  // já revelamos placar e palpites, sem depender do cron atualizar o status.
+  const kickoffPassed = game.startsAt <= new Date()
+  const showScore = status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED' || kickoffPassed
+  const canPredict = !!userId && status === 'SCHEDULED' && !kickoffPassed
 
   return (
     <main>
@@ -88,6 +89,9 @@ export default async function GameDetailPage({
               city={game.city}
             />
           </div>
+
+          <KickoffRefresh status={status} startsAt={game.startsAt.toISOString()} />
+
 
           {canPredict && (
             <div className="bg-surface border border-border rounded-[16px] p-[24px_28px] mt-[14px]">

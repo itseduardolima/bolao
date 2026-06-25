@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, timingSafeEqual } from 'crypto'
 import { syncGames } from '@/lib/sync'
+import { cleanupExpiredPayments } from '@/lib/retention'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,5 +21,15 @@ export async function GET(req: NextRequest) {
 
   const force = req.nextUrl.searchParams.get('force') === 'true'
   const result = await syncGames(force)
-  return NextResponse.json(result)
+
+  // Expurgo de retenção: limpa cobranças PIX abandonadas. Não-fatal — uma falha
+  // aqui não pode comprometer o sync de jogos.
+  let purgedPayments = 0
+  try {
+    purgedPayments = await cleanupExpiredPayments()
+  } catch (err) {
+    console.error('[cron] cleanupExpiredPayments falhou:', err)
+  }
+
+  return NextResponse.json({ sync: result, purgedPayments })
 }

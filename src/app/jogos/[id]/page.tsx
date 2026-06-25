@@ -1,8 +1,12 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getGameSummary } from '@/lib/games'
+import { SITE_URL } from '@/lib/site'
 import Container from '@/components/layout/Container'
+import JsonLd from '@/components/seo/JsonLd'
 import GameDetailHeader from '@/components/game/GameDetailHeader'
 import KickoffRefresh from '@/components/game/KickoffRefresh'
 import PredictionForm from '@/components/prediction/PredictionForm'
@@ -10,6 +14,44 @@ import ParticipantPredictions from '@/components/prediction/ParticipantPredictio
 import type { GameStatus } from '@/types'
 
 export const dynamic = 'force-dynamic'
+
+const dateFmt = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: 'long',
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: 'America/Manaus',
+})
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const game = await getGameSummary(id)
+  if (!game) return { title: 'Jogo não encontrado' }
+
+  const matchup = `${game.homeTeam} x ${game.awayTeam}`
+  const finished =
+    game.status === 'FINISHED' && game.homeScore != null && game.awayScore != null
+  const detail = finished
+    ? `Resultado: ${game.homeScore} x ${game.awayScore}.`
+    : `${dateFmt.format(game.startsAt)} (horário de Brasília/AM).`
+  const description = `${matchup} pela Copa do Mundo 2026. ${detail} Dê seu palpite e veja os palpites dos participantes.`
+
+  return {
+    title: matchup,
+    description,
+    alternates: { canonical: `/jogos/${id}` },
+    openGraph: {
+      type: 'website',
+      title: `${matchup} — Copa do Mundo 2026`,
+      description,
+    },
+    twitter: { title: `${matchup} — Copa do Mundo 2026`, description },
+  }
+}
 
 export default async function GameDetailPage({
   params,
@@ -63,8 +105,43 @@ export default async function GameDetailPage({
   const showScore = status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED' || kickoffPassed
   const canPredict = !!userId && status === 'SCHEDULED' && !kickoffPassed
 
+  const matchup = `${game.homeTeam} x ${game.awayTeam}`
+  const sportsEvent = {
+    '@context': 'https://schema.org',
+    '@type': 'SportsEvent',
+    name: matchup,
+    sport: 'Soccer',
+    startDate: game.startsAt.toISOString(),
+    url: `${SITE_URL}/jogos/${game.id}`,
+    ...(status === 'SCHEDULED' ? { eventStatus: 'https://schema.org/EventScheduled' } : {}),
+    ...(game.venue || game.city
+      ? {
+          location: {
+            '@type': 'Place',
+            name: game.venue ?? game.city,
+            ...(game.city ? { address: game.city } : {}),
+          },
+        }
+      : {}),
+    competitor: [
+      { '@type': 'SportsTeam', name: game.homeTeam },
+      { '@type': 'SportsTeam', name: game.awayTeam },
+    ],
+  }
+  const breadcrumbs = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Jogos', item: `${SITE_URL}/jogos` },
+      { '@type': 'ListItem', position: 3, name: matchup, item: `${SITE_URL}/jogos/${game.id}` },
+    ],
+  }
+
   return (
     <main>
+      <JsonLd data={sportsEvent} />
+      <JsonLd data={breadcrumbs} />
       <Container className="max-w-2xl">
         <Link
           href={`/jogos?date=${gameDate}`}

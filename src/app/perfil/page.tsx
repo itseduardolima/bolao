@@ -16,6 +16,7 @@ export const dynamic = 'force-dynamic'
 
 // Página privada (requer login) — fora do índice de busca.
 export const metadata = {
+  title: 'Meu perfil',
   robots: { index: false, follow: false },
 }
 

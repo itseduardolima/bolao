@@ -1,6 +1,13 @@
 import Container from '@/components/layout/Container'
 import PointsBadge from '@/components/ui/PointsBadge'
 
+export const metadata = {
+  title: 'Como funciona a pontuação',
+  description:
+    'Entenda como os palpites viram pontos no Bolão Copa 2026: placar exato vale 3, acerto do vencedor vale 1.',
+  alternates: { canonical: '/pontuacao' },
+}
+
 const EXAMPLES = [
   { result: '2 - 1', prediction: '2 - 1', points: 3, reason: 'Placar idêntico.' },
   { result: '2 - 1', prediction: '3 - 0', points: 1, reason: 'Acertou que o mandante venceu.' },

@@ -7,6 +7,10 @@ import { formatGameTime } from '@/lib/utils'
 import { StatusBadge } from '@/components/ui/Badge'
 import type { GameStatus } from '@/types'
 
+// Teto do setTimeout (~24,8 dias). Acima disso o delay estoura e dispara na hora;
+// para jogos mais distantes deixamos o status real chegar pelo cron.
+const MAX_TIMEOUT_MS = 2_147_483_647
+
 type GameCardProps = {
   id: string
   homeTeam: string
@@ -67,17 +71,12 @@ export default function GameCard({
   useEffect(() => {
     if (status !== 'SCHEDULED') return
     const remaining = startsAtMs - Date.now()
-    if (remaining <= 0) {
-      setEffectiveStatus('LIVE')
-      setEffectiveHomeScore(0)
-      setEffectiveAwayScore(0)
-      return
-    }
+    if (remaining >= MAX_TIMEOUT_MS) return // jogo distante: status real vem pelo cron
     const timer = setTimeout(() => {
       setEffectiveStatus('LIVE')
       setEffectiveHomeScore(0)
       setEffectiveAwayScore(0)
-    }, remaining)
+    }, Math.max(remaining, 0))
     return () => clearTimeout(timer)
   }, [status, startsAtMs])
 

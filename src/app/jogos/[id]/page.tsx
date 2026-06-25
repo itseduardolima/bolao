@@ -1,20 +1,14 @@
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { formatGameTime } from '@/lib/utils'
 import Container from '@/components/layout/Container'
-import { StatusBadge } from '@/components/ui/Badge'
+import GameDetailHeader from '@/components/game/GameDetailHeader'
 import PredictionForm from '@/components/prediction/PredictionForm'
 import ParticipantPredictions from '@/components/prediction/ParticipantPredictions'
 import type { GameStatus } from '@/types'
 
 export const dynamic = 'force-dynamic'
-
-function toCode(name: string) {
-  return name.slice(0, 3).toUpperCase()
-}
 
 export default async function GameDetailPage({
   params,
@@ -68,19 +62,6 @@ export default async function GameDetailPage({
     status === 'SCHEDULED' &&
     new Date(game.startsAt) > new Date()
 
-  let scoreCenter: string
-  let scoreColor: string
-  if (status === 'LIVE' || status === 'PAUSED') {
-    scoreCenter = `${game.homeScore ?? 0} - ${game.awayScore ?? 0}`
-    scoreColor = '#00ff87'
-  } else if (status === 'FINISHED') {
-    scoreCenter = `${game.homeScore ?? 0} - ${game.awayScore ?? 0}`
-    scoreColor = '#fff'
-  } else {
-    scoreCenter = formatGameTime(game.startsAt)
-    scoreColor = 'rgba(255,255,255,.3)'
-  }
-
   return (
     <main>
       <Container className="max-w-2xl">
@@ -94,62 +75,18 @@ export default async function GameDetailPage({
 
         <div className="max-w-[660px] mx-auto mt-[18px]">
           <div className="bg-surface border border-border rounded-[16px] p-[26px_28px]">
-            <div className="flex justify-center">
-              <StatusBadge status={status} />
-            </div>
-
-            <div className="grid [grid-template-columns:1fr_auto_1fr] items-center gap-[18px] mt-[20px]">
-              <div className="flex flex-col items-center gap-[9px]">
-                {game.homeFlag ? (
-                  <Image
-                    src={game.homeFlag}
-                    alt={game.homeTeam}
-                    width={52}
-                    height={36}
-                    className="rounded-[5px] shadow-[0_2px_8px_rgba(0,0,0,.3)] object-cover"
-                  />
-                ) : (
-                  <div className="w-[52px] h-[36px] rounded-[5px] bg-elevated" />
-                )}
-                <div className="font-barlow text-[26px] font-extrabold text-primary leading-none">
-                  {toCode(game.homeTeam)}
-                </div>
-                <div className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.55)]">
-                  {game.homeTeam}
-                </div>
-              </div>
-
-              <div
-                className="font-barlow text-[44px] font-extrabold leading-none whitespace-nowrap"
-                style={{ color: scoreColor }}
-              >
-                {scoreCenter}
-              </div>
-
-              <div className="flex flex-col items-center gap-[9px]">
-                {game.awayFlag ? (
-                  <Image
-                    src={game.awayFlag}
-                    alt={game.awayTeam}
-                    width={52}
-                    height={36}
-                    className="rounded-[5px] shadow-[0_2px_8px_rgba(0,0,0,.3)] object-cover"
-                  />
-                ) : (
-                  <div className="w-[52px] h-[36px] rounded-[5px] bg-elevated" />
-                )}
-                <div className="font-barlow text-[26px] font-extrabold text-primary leading-none">
-                  {toCode(game.awayTeam)}
-                </div>
-                <div className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.55)]">
-                  {game.awayTeam}
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)] mt-[18px]">
-              {game.phase}{game.city ? ` · ${game.city}` : ''}
-            </div>
+            <GameDetailHeader
+              status={status}
+              startsAt={game.startsAt.toISOString()}
+              homeScore={game.homeScore}
+              awayScore={game.awayScore}
+              homeTeam={game.homeTeam}
+              awayTeam={game.awayTeam}
+              homeFlag={game.homeFlag}
+              awayFlag={game.awayFlag}
+              phase={game.phase}
+              city={game.city}
+            />
           </div>
 
           {canPredict && (

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { StatusBadge } from '@/components/ui/Badge'
-import { formatGameTime } from '@/lib/utils'
+import { cn, formatGameTime } from '@/lib/utils'
 import type { GameStatus } from '@/types'
 
 // Teto do setTimeout (~24,8 dias). Acima disso o delay estoura e dispara na hora;
@@ -64,16 +64,16 @@ export default function GameDetailHeader({
   }, [status, startsAtMs])
 
   let scoreText: string
-  let scoreColor: string
+  let scoreColorClass: string
   if (effectiveStatus === 'LIVE' || effectiveStatus === 'PAUSED') {
     scoreText = `${effectiveHomeScore ?? 0} - ${effectiveAwayScore ?? 0}`
-    scoreColor = '#00ff87'
+    scoreColorClass = 'text-accent'
   } else if (effectiveStatus === 'FINISHED') {
     scoreText = `${effectiveHomeScore ?? 0} - ${effectiveAwayScore ?? 0}`
-    scoreColor = '#fff'
+    scoreColorClass = 'text-white'
   } else {
     scoreText = formatGameTime(startsAt)
-    scoreColor = 'rgba(255,255,255,.3)'
+    scoreColorClass = 'text-white/30'
   }
 
   return (
@@ -98,15 +98,12 @@ export default function GameDetailHeader({
           <div className="font-barlow text-[26px] font-extrabold text-primary leading-none">
             {toCode(homeTeam)}
           </div>
-          <div className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.55)]">
+          <div className="font-inter text-[12px] font-medium text-white/55">
             {homeTeam}
           </div>
         </div>
 
-        <div
-          className="font-barlow text-[44px] font-extrabold leading-none whitespace-nowrap"
-          style={{ color: scoreColor }}
-        >
+        <div className={cn('font-barlow text-[44px] font-extrabold leading-none whitespace-nowrap', scoreColorClass)}>
           {scoreText}
         </div>
 
@@ -125,13 +122,13 @@ export default function GameDetailHeader({
           <div className="font-barlow text-[26px] font-extrabold text-primary leading-none">
             {toCode(awayTeam)}
           </div>
-          <div className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.55)]">
+          <div className="font-inter text-[12px] font-medium text-white/55">
             {awayTeam}
           </div>
         </div>
       </div>
 
-      <div className="text-center font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)] mt-[18px]">
+      <div className="text-center font-inter text-[12px] font-medium text-white/[42%] mt-[18px]">
         {phase}{city ? ` · ${city}` : ''}
       </div>
     </>

@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { formatGameTime } from '@/lib/utils'
+import { cn, formatGameTime } from '@/lib/utils'
 import { StatusBadge } from '@/components/ui/Badge'
+import PointsBadge from '@/components/ui/PointsBadge'
 import type { GameStatus } from '@/types'
 
 // Teto do setTimeout (~24,8 dias). Acima disso o delay estoura e dispara na hora;
@@ -28,18 +29,6 @@ type GameCardProps = {
 
 function toCode(name: string): string {
   return name.slice(0, 3).toUpperCase()
-}
-
-function PointsBadge({ points }: { points: number }) {
-  if (points === 3) return (
-    <span className="font-barlow text-[12px] font-bold text-accent bg-[rgba(0,255,135,.12)] rounded-[6px] px-[10px] py-[3px]">+3</span>
-  )
-  if (points === 1) return (
-    <span className="font-barlow text-[12px] font-bold text-warning bg-[rgba(245,158,11,.14)] rounded-[6px] px-[10px] py-[3px]">+1</span>
-  )
-  return (
-    <span className="font-barlow text-[12px] font-bold text-[rgba(255,255,255,.5)] bg-[rgba(255,255,255,.07)] rounded-[6px] px-[10px] py-[3px]">0</span>
-  )
 }
 
 export default function GameCard({
@@ -81,7 +70,7 @@ export default function GameCard({
   }, [status, startsAtMs])
 
   const showScore = effectiveStatus === 'LIVE' || effectiveStatus === 'PAUSED' || effectiveStatus === 'FINISHED'
-  const scoreColor = effectiveStatus === 'LIVE' ? '#00ff87' : showScore ? '#fff' : 'rgba(255,255,255,.3)'
+  const scoreColorClass = effectiveStatus === 'LIVE' ? 'text-accent' : showScore ? 'text-white' : 'text-white/30'
   const scoreOrTime = showScore
     ? `${effectiveHomeScore ?? 0} - ${effectiveAwayScore ?? 0}`
     : 'VS'
@@ -89,10 +78,10 @@ export default function GameCard({
   return (
     <Link
       href={`/jogos/${id}`}
-      className="block bg-surface border border-border rounded-[12px] p-[16px_18px] cursor-pointer hover:border-[rgba(255,255,255,.16)] hover:bg-[#1a1a30] transition-colors"
+      className="block bg-surface border border-border rounded-[12px] p-[16px_18px] cursor-pointer hover:border-white/[16%] hover:bg-[#1a1a30] transition-colors"
     >
       <div className="flex items-center justify-between">
-        <span className="font-[Barlow_Condensed] text-[10px] font-semibold tracking-[.12em] text-[rgba(255,255,255,.42)] uppercase">{phase}</span>
+        <span className="font-barlow text-[10px] font-semibold tracking-[.12em] text-white/[42%] uppercase">{phase}</span>
         <StatusBadge status={effectiveStatus} />
       </div>
 
@@ -103,7 +92,7 @@ export default function GameCard({
             : <div className="w-[26px] h-[18px] rounded-[3px] bg-elevated flex-shrink-0" />}
           <span className="font-barlow text-[16px] font-bold text-primary">{toCode(homeTeam)}</span>
         </div>
-        <div className="font-barlow text-[22px] font-extrabold px-[12px] flex-shrink-0" style={{ color: scoreColor }}>
+        <div className={cn('font-barlow text-[22px] font-extrabold px-[12px] flex-shrink-0', scoreColorClass)}>
           {scoreOrTime}
         </div>
         <div className="flex items-center gap-[10px] flex-1 min-w-0 justify-end">
@@ -115,13 +104,13 @@ export default function GameCard({
       </div>
 
       <div className="mt-[14px] pt-[12px] border-t border-border flex items-center justify-between min-h-[24px]">
-        <span className="font-inter text-[12px] font-medium text-[rgba(255,255,255,.42)]">
+        <span className="font-inter text-[12px] font-medium text-white/[42%]">
           {effectiveStatus === 'SCHEDULED' ? formatGameTime(startsAt) : ''}
         </span>
         <div className="flex items-center gap-[8px]">
           {prediction ? (
             <>
-              <span className="font-inter text-[12px] font-semibold text-[rgba(255,255,255,.7)]">
+              <span className="font-inter text-[12px] font-semibold text-white/70">
                 Palpite {prediction.homeScore} × {prediction.awayScore}
               </span>
               {prediction.points !== null && <PointsBadge points={prediction.points} />}
@@ -129,7 +118,7 @@ export default function GameCard({
           ) : isAuthenticated && effectiveStatus === 'SCHEDULED' ? (
             <span className="font-inter text-[12px] font-semibold text-accent cursor-pointer">Palpitar →</span>
           ) : isAuthenticated ? (
-            <span className="font-inter text-[12px] font-semibold text-[rgba(255,255,255,.55)]">Ver detalhes →</span>
+            <span className="font-inter text-[12px] font-semibold text-white/55">Ver detalhes →</span>
           ) : null}
         </div>
       </div>

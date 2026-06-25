@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useRef, useEffect } from 'react'
+import { cn } from '@/lib/utils'
 
 type DateNavProps = {
   dates: string[]
@@ -44,37 +45,33 @@ export default function DateNav({ dates, selectedDate, today }: DateNavProps) {
         const isSelected = date === selectedDate
         const isToday = date === today
 
-        const bg = isSelected ? '#00ff87' : 'transparent'
-        const borderColor = isSelected ? '#00ff87' : 'rgba(255,255,255,.1)'
-        const numColor = isSelected ? '#0f0f1a' : 'rgba(255,255,255,.9)'
-        const wkColor = isSelected ? 'rgba(0,0,0,.65)' : 'rgba(255,255,255,.42)'
-        const dotColor = isToday && !isSelected ? '#00ff87' : 'transparent'
-
         return (
           <button
             key={date}
             ref={isSelected ? selectedRef : undefined}
             onClick={() => navigate(date)}
-            style={{ background: bg, borderColor }}
-            className="w-[62px] py-[10px] pb-[9px] rounded-[11px] flex-shrink-0 cursor-pointer text-center border"
+            className={cn(
+              'w-[62px] py-[10px] pb-[9px] rounded-[11px] flex-shrink-0 cursor-pointer text-center border',
+              isSelected ? 'bg-accent border-accent' : 'bg-transparent border-white/10'
+            )}
           >
-            <div
-              style={{ color: wkColor }}
-              className="font-[Barlow_Condensed] text-[10px] font-semibold tracking-[.1em] uppercase"
-            >
+            <div className={cn(
+              'font-barlow text-[10px] font-semibold tracking-[.1em] uppercase',
+              isSelected ? 'text-black/65' : 'text-white/[42%]'
+            )}>
               {weekday}
             </div>
-            <div
-              style={{ color: numColor }}
-              className="font-barlow text-[19px] font-bold mt-[2px]"
-            >
+            <div className={cn(
+              'font-barlow text-[19px] font-bold mt-[2px]',
+              isSelected ? 'text-base' : 'text-white/90'
+            )}>
               {day}
             </div>
             <div className="flex items-center justify-center h-[5px] mt-[4px]">
-              <span
-                style={{ background: dotColor }}
-                className="w-[5px] h-[5px] rounded-full"
-              />
+              <span className={cn(
+                'w-[5px] h-[5px] rounded-full',
+                isToday && !isSelected ? 'bg-accent' : 'bg-transparent'
+              )} />
             </div>
           </button>
         )

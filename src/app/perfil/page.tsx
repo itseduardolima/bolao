@@ -8,6 +8,7 @@ import Card from '@/components/ui/Card'
 import Eyebrow from '@/components/ui/Eyebrow'
 import StatCard from '@/components/ui/StatCard'
 import PointsBadge from '@/components/ui/PointsBadge'
+import DeleteAccountButton from '@/components/account/DeleteAccountButton'
 import { cn } from '@/lib/utils'
 import type { GameStatus } from '@/types'
 
@@ -176,6 +177,23 @@ export default async function PerfilPage() {
           <PhaseSection key={phase} phase={phase} rows={byPhase[phase]} predMap={predMap} />
         ))}
       </div>
+
+      <Card className="rounded-[14px] p-[20px] mt-[26px]">
+        <Eyebrow className="text-[11px] tracking-[.2em]">Privacidade e dados</Eyebrow>
+        <p className="font-inter text-[13px] leading-[1.55] text-white/[55%] mt-[8px] max-w-[520px]">
+          Você pode baixar uma cópia dos seus dados ou excluir sua conta a qualquer momento. A exclusão é permanente e não pode ser desfeita.
+        </p>
+        <div className="flex flex-wrap items-center gap-[12px] mt-[16px]">
+          <a
+            href="/api/account/export"
+            download
+            className="inline-flex items-center bg-transparent border border-border text-secondary hover:text-primary px-[18px] py-[10px] rounded-[10px] font-inter text-[13px] font-semibold transition-colors"
+          >
+            Baixar meus dados
+          </a>
+          <DeleteAccountButton />
+        </div>
+      </Card>
     </Container>
   )
 }

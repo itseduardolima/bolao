@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { cn, formatGameTime } from '@/lib/utils'
+import { cn, formatGameTime, getMatchDecider } from '@/lib/utils'
 import { StatusBadge } from '@/components/ui/Badge'
 import PointsBadge from '@/components/ui/PointsBadge'
 import type { GameStatus } from '@/types'
@@ -20,8 +20,13 @@ type GameCardProps = {
   awayFlag: string | null
   startsAt: string
   status: GameStatus
+  duration?: string | null
   homeScore: number | null
   awayScore: number | null
+  extraTimeHome?: number | null
+  extraTimeAway?: number | null
+  penaltiesHome?: number | null
+  penaltiesAway?: number | null
   phase?: string
   prediction?: { homeScore: number; awayScore: number; points: number | null } | null
   isAuthenticated?: boolean
@@ -39,8 +44,13 @@ export default function GameCard({
   awayFlag,
   startsAt,
   status,
+  duration,
   homeScore,
   awayScore,
+  extraTimeHome,
+  extraTimeAway,
+  penaltiesHome,
+  penaltiesAway,
   phase,
   prediction,
   isAuthenticated,
@@ -75,6 +85,18 @@ export default function GameCard({
     ? `${effectiveHomeScore ?? 0} - ${effectiveAwayScore ?? 0}`
     : 'VS'
 
+  // Placar principal vale o tempo normal (90 min). Pênaltis/prorrogação aparecem
+  // só como informação adicional, sem entrar na pontuação.
+  const decider = getMatchDecider({
+    status,
+    homeScore,
+    awayScore,
+    extraTimeHome,
+    extraTimeAway,
+    penaltiesHome,
+    penaltiesAway,
+  })
+
   return (
     <Link
       href={`/jogos/${id}`}
@@ -82,7 +104,7 @@ export default function GameCard({
     >
       <div className="flex items-center justify-between">
         <span className="font-barlow text-[10px] font-semibold tracking-[.12em] text-white/[42%] uppercase">{phase}</span>
-        <StatusBadge status={effectiveStatus} />
+        <StatusBadge status={effectiveStatus} duration={duration} />
       </div>
 
       <div className="flex items-center justify-between mt-[14px]">
@@ -92,8 +114,15 @@ export default function GameCard({
             : <div className="w-[26px] h-[18px] rounded-[3px] bg-elevated flex-shrink-0" />}
           <span className="font-barlow text-[16px] font-bold text-primary">{toCode(homeTeam)}</span>
         </div>
-        <div className={cn('font-barlow text-[22px] font-extrabold px-[12px] flex-shrink-0', scoreColorClass)}>
-          {scoreOrTime}
+        <div className="flex flex-col items-center px-[12px] flex-shrink-0 leading-none">
+          <span className={cn('font-barlow text-[22px] font-extrabold', scoreColorClass)}>
+            {scoreOrTime}
+          </span>
+          {decider && (
+            <span className="font-inter text-[9px] font-semibold uppercase tracking-[.08em] text-white/45 mt-[3px] whitespace-nowrap">
+              {decider.type === 'penalties' ? 'pên' : 'prorr'} {decider.home}-{decider.away}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-[10px] flex-1 min-w-0 justify-end">
           <span className="font-barlow text-[16px] font-bold text-primary">{toCode(awayTeam)}</span>

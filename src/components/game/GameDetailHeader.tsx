@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { StatusBadge } from '@/components/ui/Badge'
-import { cn, formatGameTime } from '@/lib/utils'
+import { cn, formatGameTime, getMatchDecider } from '@/lib/utils'
 import type { GameStatus } from '@/types'
 
 // Teto do setTimeout (~24,8 dias). Acima disso o delay estoura e dispara na hora;
@@ -12,9 +12,14 @@ const MAX_TIMEOUT_MS = 2_147_483_647
 
 type Props = {
   status: GameStatus
+  duration: string | null
   startsAt: string
   homeScore: number | null
   awayScore: number | null
+  extraTimeHome: number | null
+  extraTimeAway: number | null
+  penaltiesHome: number | null
+  penaltiesAway: number | null
   homeTeam: string
   awayTeam: string
   homeFlag: string | null
@@ -29,9 +34,14 @@ function toCode(name: string) {
 
 export default function GameDetailHeader({
   status,
+  duration,
   startsAt,
   homeScore,
   awayScore,
+  extraTimeHome,
+  extraTimeAway,
+  penaltiesHome,
+  penaltiesAway,
   homeTeam,
   awayTeam,
   homeFlag,
@@ -76,10 +86,22 @@ export default function GameDetailHeader({
     scoreColorClass = 'text-white/30'
   }
 
+  // O placar grande vale o tempo normal (90 min). Pênaltis/prorrogação aparecem
+  // só como informação adicional, sem entrar na pontuação.
+  const decider = getMatchDecider({
+    status,
+    homeScore,
+    awayScore,
+    extraTimeHome,
+    extraTimeAway,
+    penaltiesHome,
+    penaltiesAway,
+  })
+
   return (
     <>
       <div className="flex justify-center">
-        <StatusBadge status={effectiveStatus} />
+        <StatusBadge status={effectiveStatus} duration={duration} />
       </div>
 
       <div className="grid [grid-template-columns:1fr_auto_1fr] items-center gap-[18px] mt-[20px]">
@@ -103,8 +125,15 @@ export default function GameDetailHeader({
           </div>
         </div>
 
-        <div className={cn('font-barlow text-[44px] font-extrabold leading-none whitespace-nowrap', scoreColorClass)}>
-          {scoreText}
+        <div className="flex flex-col items-center gap-[6px]">
+          <div className={cn('font-barlow text-[44px] font-extrabold leading-none whitespace-nowrap', scoreColorClass)}>
+            {scoreText}
+          </div>
+          {decider && (
+            <span className="font-inter text-[11px] font-semibold uppercase tracking-[.12em] text-white/55 whitespace-nowrap">
+              {decider.type === 'penalties' ? 'Pênaltis' : 'Prorrogação'} {decider.home} - {decider.away}
+            </span>
+          )}
         </div>
 
         <div className="flex flex-col items-center gap-[9px]">

@@ -53,8 +53,13 @@ export default async function JogosPage({
       awayFlag: true,
       startsAt: true,
       status: true,
+      duration: true,
       homeScore: true,
       awayScore: true,
+      extraTimeHome: true,
+      extraTimeAway: true,
+      penaltiesHome: true,
+      penaltiesAway: true,
       phase: true,
     },
   })

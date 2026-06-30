@@ -155,9 +155,14 @@ export default async function GameDetailPage({
           <div className="bg-surface border border-border rounded-[16px] p-[26px_28px]">
             <GameDetailHeader
               status={status}
+              duration={game.duration}
               startsAt={game.startsAt.toISOString()}
               homeScore={game.homeScore}
               awayScore={game.awayScore}
+              extraTimeHome={game.extraTimeHome}
+              extraTimeAway={game.extraTimeAway}
+              penaltiesHome={game.penaltiesHome}
+              penaltiesAway={game.penaltiesAway}
               homeTeam={game.homeTeam}
               awayTeam={game.awayTeam}
               homeFlag={game.homeFlag}

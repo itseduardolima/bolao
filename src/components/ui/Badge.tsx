@@ -37,6 +37,18 @@ export default function Badge({ variant, children, className }: BadgeProps) {
   )
 }
 
-export function StatusBadge({ status }: { status: GameStatus }) {
-  return <Badge variant={status}>{statusLabels[status]}</Badge>
+// Durante um mata-mata ao vivo, mostra a fase ("Prorrogação"/"Pênaltis") no
+// lugar de "Ao vivo", mantendo o mesmo visual pulsante do status LIVE.
+// `duration` vem do campo da football-data.org (EXTRA_TIME / PENALTY_SHOOTOUT).
+export function StatusBadge({
+  status,
+  duration,
+}: {
+  status: GameStatus
+  duration?: string | null
+}) {
+  let label = statusLabels[status]
+  if (status === 'LIVE' && duration === 'EXTRA_TIME') label = 'Prorrogação'
+  else if (status === 'LIVE' && duration === 'PENALTY_SHOOTOUT') label = 'Pênaltis'
+  return <Badge variant={status}>{label}</Badge>
 }

@@ -124,7 +124,10 @@ const STATUS_MAP: Record<string, string> = {
 
 const STAGE_MAP: Record<string, string> = {
   GROUP_STAGE: 'Fase de Grupos',
-  ROUND_OF_16: 'Oitavas de Final',
+  // Copa 2026 tem 48 seleções: a API usa LAST_32 (16-avos) e LAST_16 (oitavas).
+  LAST_32: '16 Avos de Final',
+  LAST_16: 'Oitavas de Final',
+  ROUND_OF_16: 'Oitavas de Final', // formato antigo (32 seleções), mantido por segurança
   QUARTER_FINALS: 'Quartas de Final',
   SEMI_FINALS: 'Semifinal',
   THIRD_PLACE: 'Disputa de Terceiro Lugar',

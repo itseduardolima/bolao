@@ -13,7 +13,7 @@ Site de bolão entre amigos para a Copa do Mundo de 2026. Sem apostas ou prêmio
 | Pagamentos | [Asaas](https://www.asaas.com) — cobrança PIX para criação de ligas |
 | Estilo | Tailwind CSS v4 — visual dark/esports |
 | Ícones | Phosphor Icons |
-| Deploy | Vercel + Vercel Cron |
+| Deploy | Vercel + cron externo (cron-job.org) |
 
 ## Como funciona
 
@@ -42,11 +42,23 @@ Site de bolão entre amigos para a Copa do Mundo de 2026. Sem apostas ou prêmio
 
 ## Sincronização de jogos
 
-Os jogos e placares vêm da football-data.org através de `syncGames()` (`src/lib/sync.ts`), que cria/atualiza partidas e recalcula os pontos dos palpites quando um jogo é finalizado. O sync é disparado por:
+Os jogos e placares vêm da football-data.org através de `syncGames()` (`src/lib/sync.ts`), que cria/atualiza partidas e recalcula os pontos dos palpites assim que o placar do tempo normal (90 min) trava — no encerramento ou ao entrar em prorrogação/pênaltis. O sync é disparado por:
 
-- **Cron diário** — `vercel.json` agenda `/api/cron/sync` às 08:00 UTC (protegido por `CRON_SECRET`).
-- **Ao vivo** — `/api/games/[id]/live` sincroniza sob demanda quando o dado está desatualizado e o jogo está em andamento; o front faz polling a cada 5 min.
+- **Cron externo (cron-job.org)** — chama `GET /api/cron/sync` a cada 5 min (protegido por `CRON_SECRET`). É o que mantém placares e ranking atualizados durante os jogos (ver configuração abaixo).
+- **Cron diário (Vercel, fallback)** — `vercel.json` agenda `/api/cron/sync` às 08:00 UTC. Redundante com o cron-job.org, mantido apenas como rede de segurança.
 - **Manual** — botão na página de jogos chama `/api/games/sync` (requer usuário autenticado).
+
+> A listagem de jogos se atualiza sozinha (re-render do servidor a cada 60s) enquanto houver jogo ao vivo — ela lê o banco, que o cron mantém fresco.
+
+### Configuração do cron-job.org
+
+1. Crie uma conta gratuita em [cron-job.org](https://cron-job.org).
+2. **Create cronjob**:
+   - **URL:** `https://SEU_DOMINIO/api/cron/sync` (sem `?force=true`)
+   - **Schedule:** a cada 5 minutos
+   - **Request method:** GET
+   - **Header:** `Authorization: Bearer <valor de CRON_SECRET>`
+3. Em dias sem jogo a rota faz no-op (gate `hasGameNearby`) e não consome a cota da football-data; em dias de jogo ela sincroniza os placares ao vivo.
 
 ## Fluxo de pagamento (ligas)
 

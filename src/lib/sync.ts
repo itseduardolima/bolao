@@ -81,13 +81,18 @@ export async function syncGames(force = false): Promise<SyncResult> {
       const externalId = String(match.id)
       const status = mapStatus(match.status)
       const phase = mapStage(match.stage)
+      // Pontuação e placar exibido valem SEMPRE o tempo normal (90 min):
+      // em mata-mata a football-data.org soma os pênaltis no `fullTime`
+      // (ex.: 1-1 + pênaltis 3-4 → fullTime 4-5). `regularTime` traz o placar
+      // de 90 min e só existe quando houve prorrogação/pênaltis; em jogos
+      // normais usamos `fullTime`, que aí já é o placar de 90 min.
       const homeScore =
-        match.score.fullTime.home ??
         match.score.regularTime?.home ??
+        match.score.fullTime.home ??
         null
       const awayScore =
-        match.score.fullTime.away ??
         match.score.regularTime?.away ??
+        match.score.fullTime.away ??
         null
       const halfTimeHome = match.score.halfTime?.home ?? null
       const halfTimeAway = match.score.halfTime?.away ?? null

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { getGameSummary } from '@/lib/games'
+import { isRegularTimeLocked } from '@/lib/scoring'
 import { SITE_URL } from '@/lib/site'
 import Container from '@/components/layout/Container'
 import JsonLd from '@/components/seo/JsonLd'
@@ -104,6 +105,8 @@ export default async function GameDetailPage({
   const kickoffPassed = game.startsAt <= new Date()
   const showScore = status === 'LIVE' || status === 'PAUSED' || status === 'FINISHED' || kickoffPassed
   const canPredict = !!userId && status === 'SCHEDULED' && !kickoffPassed
+  // Pontos já são finais a partir da prorrogação/pênaltis (não só ao encerrar).
+  const scoringLocked = isRegularTimeLocked(status, game.duration)
 
   const matchup = `${game.homeTeam} x ${game.awayTeam}`
   const sportsEvent = {
@@ -208,7 +211,7 @@ export default async function GameDetailPage({
           {showScore && (
             <ParticipantPredictions
               gameId={game.id}
-              showStats={status === 'FINISHED'}
+              showStats={scoringLocked}
               currentUserId={userId ?? undefined}
             />
           )}

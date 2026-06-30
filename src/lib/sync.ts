@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { fetchMatches, mapStatus, mapStage, translateTeamName } from '@/lib/football-data'
-import { calculatePoints } from '@/lib/scoring'
+import { calculatePoints, isRegularTimeLocked } from '@/lib/scoring'
 
 export type SyncResult =
   | { skipped: true }
@@ -174,8 +174,11 @@ export async function syncGames(force = false): Promise<SyncResult> {
       })
       updated++
 
+      // Pontua assim que o placar de 90 min trava (jogo encerrado OU já passou
+      // do tempo normal). Em prorrogação/pênaltis, homeScore/awayScore já é o
+      // placar de 90 min (regularTime), então os pontos saem na hora.
       if (
-        status === 'FINISHED' &&
+        isRegularTimeLocked(status, duration) &&
         homeScore !== null &&
         awayScore !== null &&
         (statusChanged || scoreChanged)

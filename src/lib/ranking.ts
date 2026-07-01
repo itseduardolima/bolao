@@ -77,18 +77,15 @@ export const getGroupRanking = unstable_cache(
         u.id,
         u.nickname,
         u.image,
-        COALESCE(SUM(ep.points), 0) AS totalPoints,
-        COUNT(CASE WHEN ep.points = 3 THEN 1 END) AS exactHits,
-        COUNT(CASE WHEN ep.points = 1 THEN 1 END) AS winnerHits,
-        COUNT(ep.id) AS gamesPlayed
+        COALESCE(SUM(CASE WHEN g.id IS NOT NULL THEN p.points END), 0) AS totalPoints,
+        COUNT(CASE WHEN g.id IS NOT NULL AND p.points = 3 THEN 1 END) AS exactHits,
+        COUNT(CASE WHEN g.id IS NOT NULL AND p.points = 1 THEN 1 END) AS winnerHits,
+        COUNT(CASE WHEN g.id IS NOT NULL THEN p.id END) AS gamesPlayed
       FROM GroupMember gm
       JOIN User u      ON u.id = gm.userId
       JOIN "Group" grp ON grp.id = gm.groupId
-      LEFT JOIN (
-        SELECT p.id, p.userId, p.points, g.startsAt
-        FROM Prediction p
-        JOIN Game g ON g.id = p.gameId
-      ) ep ON ep.userId = u.id AND ep.startsAt >= grp.createdAt
+      LEFT JOIN Prediction p ON p.userId = u.id
+      LEFT JOIN Game g ON g.id = p.gameId AND g.startsAt >= grp.createdAt
       WHERE gm.groupId = ${groupId}
       GROUP BY u.id, u.nickname, u.image
       ORDER BY

@@ -1,3 +1,4 @@
+import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { fetchMatches, mapStatus, mapStage, translateTeamName } from '@/lib/football-data'
 import { calculatePoints, isRegularTimeLocked } from '@/lib/scoring'
@@ -55,14 +56,19 @@ async function recalculatePoints(
 export async function syncGames(force = false): Promise<SyncResult> {
   if (!force) {
     const nearby = await hasGameNearby()
-    if (!nearby) return { skipped: true }
+    if (!nearby) {
+      console.log('[sync] pulado: nenhum jogo em ±1 dia e force=false')
+      return { skipped: true }
+    }
   }
 
   let matches: Awaited<ReturnType<typeof fetchMatches>>
   try {
     matches = await fetchMatches()
+    console.log(`[sync] football-data.org retornou ${matches.length} partidas`)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
+    console.error('[sync] fetchMatches falhou:', message)
     return { error: true, message }
   }
 
@@ -135,6 +141,7 @@ export async function syncGames(force = false): Promise<SyncResult> {
           },
         })
         created++
+        revalidateTag('games', 'max')
         continue
       }
 
@@ -173,6 +180,7 @@ export async function syncGames(force = false): Promise<SyncResult> {
         },
       })
       updated++
+      revalidateTag('games', 'max')
 
       // Pontua assim que o placar de 90 min trava (jogo encerrado OU já passou
       // do tempo normal). Em prorrogação/pênaltis, homeScore/awayScore já é o
@@ -184,11 +192,14 @@ export async function syncGames(force = false): Promise<SyncResult> {
         (statusChanged || scoreChanged)
       ) {
         await recalculatePoints(existing.id, homeScore, awayScore)
+        revalidateTag('ranking', 'max')
       }
-    } catch {
+    } catch (err) {
+      console.error('[sync] falha ao processar partida', match.id, err)
       errors++
     }
   }
 
+  console.log(`[sync] concluído: ${created} criados, ${updated} atualizados, ${skipped} ignorados, ${errors} erros`)
   return { updated, created, skipped, errors }
 }

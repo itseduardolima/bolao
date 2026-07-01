@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getAllGames } from '@/lib/games'
 import Container from '@/components/layout/Container'
 import GameCard from '@/components/game/GameCard'
 import DateNav from '@/components/game/DateNav'
@@ -19,10 +20,10 @@ export const metadata: Metadata = {
   alternates: { canonical: '/jogos' },
 }
 
-function toLocalDate(date: Date): string {
+function toLocalDate(date: Date | string): string {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Manaus',
-  }).format(date)
+  }).format(new Date(date))
 }
 
 function getDefaultDate(dates: string[]): string {
@@ -43,26 +44,7 @@ export default async function JogosPage({
   const session = await auth()
   const userId = session?.user?.id
 
-  const allGames = await prisma.game.findMany({
-    orderBy: { startsAt: 'asc' },
-    select: {
-      id: true,
-      homeTeam: true,
-      awayTeam: true,
-      homeFlag: true,
-      awayFlag: true,
-      startsAt: true,
-      status: true,
-      duration: true,
-      homeScore: true,
-      awayScore: true,
-      extraTimeHome: true,
-      extraTimeAway: true,
-      penaltiesHome: true,
-      penaltiesAway: true,
-      phase: true,
-    },
-  })
+  const allGames = await getAllGames()
 
   const dates: string[] = Array.from(
     new Set(allGames.map((g) => toLocalDate(g.startsAt)))
@@ -123,7 +105,7 @@ export default async function JogosPage({
               <GameCard
                 key={game.id}
                 {...game}
-                startsAt={game.startsAt.toISOString()}
+                startsAt={new Date(game.startsAt).toISOString()}
                 status={game.status as GameStatus}
                 prediction={predictionMap.get(game.id) ?? null}
                 isAuthenticated={!!userId}

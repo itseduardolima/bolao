@@ -99,6 +99,8 @@ model Game {
   createdAt       DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   predictions Prediction[]
+
+  @@index([startsAt])
 }
 
 model GroupPayment {
@@ -131,4 +133,5 @@ model Prediction {
   game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
   @@unique([userId, gameId])
+  @@index([gameId])
 }

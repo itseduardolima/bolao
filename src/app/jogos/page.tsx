@@ -1,15 +1,11 @@
 import type { Metadata } from 'next'
-import { auth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { getAllGames } from '@/lib/games'
 import Container from '@/components/layout/Container'
-import GameCard from '@/components/game/GameCard'
+import GamesGrid from '@/components/game/GamesGrid'
 import DateNav from '@/components/game/DateNav'
 import SyncGamesButton from '@/components/game/SyncGamesButton'
 import LiveRefresh from '@/components/game/LiveRefresh'
 import type { GameStatus } from '@/types'
-
-export const dynamic = 'force-dynamic'
 
 // Canonical fixo: a página recebe `?date=` para navegar entre dias, mas todas
 // as variações consolidam em /jogos para o índice.
@@ -41,8 +37,6 @@ export default async function JogosPage({
   searchParams: Promise<{ date?: string }>
 }) {
   const { date: dateParam } = await searchParams
-  const session = await auth()
-  const userId = session?.user?.id
 
   const allGames = await getAllGames()
 
@@ -67,14 +61,6 @@ export default async function JogosPage({
     (g) => toLocalDate(g.startsAt) === selectedDate
   )
 
-  const userPredictions = userId
-    ? await prisma.prediction.findMany({
-        where: { userId, gameId: { in: dayGames.map((g) => g.id) } },
-        select: { gameId: true, homeScore: true, awayScore: true, points: true },
-      })
-    : []
-
-  const predictionMap = new Map(userPredictions.map((p) => [p.gameId, p]))
   const hasLiveGames = dayGames.some(
     (g) => g.status === 'LIVE' || g.status === 'PAUSED'
   )
@@ -100,19 +86,14 @@ export default async function JogosPage({
         {dayGames.length === 0 ? (
           <p className="text-secondary">Nenhum jogo nesta data.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-[14px]">
-            {dayGames.map((game) => (
-              <GameCard
-                key={game.id}
-                {...game}
-                startsAt={new Date(game.startsAt).toISOString()}
-                status={game.status as GameStatus}
-                prediction={predictionMap.get(game.id) ?? null}
-                isAuthenticated={!!userId}
-                phase={game.phase ?? undefined}
-              />
-            ))}
-          </div>
+          <GamesGrid
+            games={dayGames.map((game) => ({
+              ...game,
+              startsAt: new Date(game.startsAt).toISOString(),
+              status: game.status as GameStatus,
+              phase: game.phase ?? undefined,
+            }))}
+          />
         )}
       </Container>
     </main>

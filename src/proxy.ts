@@ -42,6 +42,7 @@ export default auth((req) => {
     path.startsWith('/api/games') ||
     path.startsWith('/api/asaas') ||
     path.startsWith('/api/account') || // auth-gated no próprio handler (401 limpo)
+    path.startsWith('/api/predictions') || // auth-gated no próprio handler (401 limpo)
     path.startsWith('/subscriptions/')
 
   const isApiPath = path.startsWith('/api/')

@@ -1,6 +1,8 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
-import { auth } from '@/lib/auth'
+import { useSession } from 'next-auth/react'
 import LogoCopa from '@/assets/images/logo-copa.png'
 import Avatar from '@/components/ui/Avatar'
 import Container from './Container'
@@ -8,8 +10,8 @@ import NavLinks from './NavLinks'
 import SignInButton from './SignInButton'
 import SignOutButton from './SignOutButton'
 
-export default async function Header() {
-  const session = await auth()
+export default function Header() {
+  const { data: session } = useSession()
   const user = session?.user
 
   return (

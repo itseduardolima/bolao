@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
-import { auth } from '@/lib/auth'
 import { getGlobalRanking } from '@/lib/ranking'
 import Container from '@/components/layout/Container'
-import RankingTable from '@/components/ranking/RankingTable'
+import RankingTableSession from '@/components/ranking/RankingTableSession'
 import LoginPrompt from '@/components/auth/LoginPrompt'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 // Canonical evita que variações como `/?login=1&from=...` sejam indexadas como
 // páginas distintas da home.
@@ -15,7 +14,7 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  const [session, ranking] = await Promise.all([auth(), getGlobalRanking()])
+  const ranking = await getGlobalRanking()
 
   return (
     <Container>
@@ -31,7 +30,7 @@ export default async function HomePage() {
       <p className="font-inter text-[14px] leading-[1.6] text-white/[55%] max-w-[540px] mt-[8px]">
         Classificação de todos os participantes. Sua pontuação no bolão geral vale também em cada liga que você joga.
       </p>
-      <RankingTable entries={ranking} currentUserId={session?.user?.id} />
+      <RankingTableSession entries={ranking} />
     </Container>
   )
 }

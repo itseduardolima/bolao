@@ -15,6 +15,7 @@ async function call(path: string, opts?: RequestInit) {
       'Content-Type': 'application/json',
       ...(opts?.headers ?? {}),
     },
+    signal: AbortSignal.timeout(10_000),
   })
   let data: unknown
   const text = await res.text()

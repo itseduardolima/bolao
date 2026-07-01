@@ -160,6 +160,7 @@ export async function fetchMatches(): Promise<ApiMatch[]> {
             'X-Auth-Token': process.env.FOOTBALL_DATA_API_KEY ?? '',
           },
           cache: 'no-store',
+          signal: AbortSignal.timeout(10_000),
         }
       )
       if (!res.ok) {
